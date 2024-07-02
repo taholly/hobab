@@ -5,14 +5,14 @@ import streamlit as st
 import matplotlib.pyplot as plt
 
 
-url = 'https://raw.githubusercontent.com/taholly/hobab/main/ahromi.xlsx'
+url = 'https://raw.githubusercontent.com/taholly/hobab/main/ahromi'
 response = requests.get(url)
 
 if response.status_code == 200:
     file = BytesIO(response.content)
     try:
         df = pd.read_excel(file, engine='openpyxl')
-        print(Mrepo.head())  # چاپ چند ردیف اول برای بررسی
+        print(df.head())  # چاپ چند ردیف اول برای بررسی
     except Exception as e:
         print(f"Error reading the Excel file: {e}")
 else:
