@@ -49,7 +49,7 @@ def make_plot():
     y = df['hobab']
 
     
-    p = figure(x_range=x, outer_height=350, title="Fruit Counts",
+    p = figure(x_range=x, outer_height=350, title="حباب صندوق",
                toolbar_location=None, tools="")
 
     p.vbar(x=x, top=y, width=0.5)
