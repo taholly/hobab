@@ -5,8 +5,17 @@ import streamlit as st
 from bokeh.plotting import figure
 from bokeh.models import LinearAxis, Range1d
 
-# بارگذاری داده‌ها از URL
-url = 'https://raw.githubusercontent.com/taholly/hobab/main/ahromi'
+
+
+option = st.sidebar.radio("لطفاً یکی از گزینه‌های زیر را انتخاب کنید:",
+("طلا","اهرم"))
+
+if option == "طلا":
+    fi = "tala.xlsx"
+else:
+    fi = "ahromi"
+
+url = f'https://raw.githubusercontent.com/taholly/hobab/main/{fi}'
 response = requests.get(url)
 
 if response.status_code == 200:
@@ -22,8 +31,9 @@ else:
 
 # اصلاح نام ستون
 df = df.rename(columns={'Unnamed: 0': "nemad"})
-st.write(df)  # چاپ چند ردیف اول برای بررسی
-# تابع برای ایجاد نمودار 'hobab'
+st.write(df)
+
+
 def make_hobab_plot():
     x = df['nemad']
     y = df['hobab']
@@ -63,13 +73,10 @@ st.write("را بزنید rerun برای به روز رسانی نمودار ه�
 hobab_plot = make_hobab_plot()
 leverage_plot = make_leverage_plot()
 
-# نمایش نمودارها در کنار هم
-col1, col2 = st.columns(2)
 
-with col1:
-    st.bokeh_chart(hobab_plot, use_container_width=True)
+st.bokeh_chart(hobab_plot, use_container_width=True)
 
-with col2:
+if fi == "ahromi":
     st.bokeh_chart(leverage_plot, use_container_width=True)
 
 st.write("Produced By Taha Sadeghizadeh")
