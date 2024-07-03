@@ -46,7 +46,7 @@ df.set_index(df['nemad'])
 def make_plot():
     x = df['nemad']
     y1 = df['hobab']
-    y2 = df['leverage']
+    y2 = df['Leverage']
 
     # ایجاد نمودار با استفاده از Bokeh
     p = figure(x_range=x, height=350, title="حباب صندوق و اهرم کلاسیک",
@@ -54,7 +54,7 @@ def make_plot():
 
     # اضافه کردن میله‌های عمودی برای هر دو ستون
     p.vbar(x=[i for i in range(len(x))], top=y1, width=0.4, color="blue", legend_label="Hobab", position="dodge", name="hobab")
-    p.vbar(x=[i + 0.4 for i in range(len(x))], top=y2, width=0.4, color="green", legend_label="leverage", position="dodge", name="leverage")
+    p.vbar(x=[i + 0.4 for i in range(len(x))], top=y2, width=0.4, color="green", legend_label="Leverage", position="dodge", name="Leverage")
 
     p.xgrid.grid_line_color = None
     p.y_range.start = 0
