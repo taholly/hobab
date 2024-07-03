@@ -14,7 +14,7 @@ if response.status_code == 200:
     try:
         df = pd.read_excel(file, engine='openpyxl')
         st.write("Dataframe loaded successfully:")
-        st.write()  # چاپ چند ردیف اول برای بررسی
+        st.write(df)  # چاپ چند ردیف اول برای بررسی
     except Exception as e:
         st.error(f"Error reading the Excel file: {e}")
 else:
