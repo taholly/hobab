@@ -74,12 +74,12 @@ st.write("را بزنید rerun برای به روز رسانی نمودار ه�
 
 # ایجاد نمودارها
 hobab_plot = make_hobab_plot()
-leverage_plot = make_leverage_plot()
 
 
 st.bokeh_chart(hobab_plot, use_container_width=True)
 
 if fi == "ahromi":
+    leverage_plot = make_leverage_plot()
     st.bokeh_chart(leverage_plot, use_container_width=True)
 
 st.write("Produced By Taha Sadeghizadeh")
