@@ -64,7 +64,7 @@ def create_leverage_plot(df):
         yaxis=dict(title='اهرم', range=[min_value, df['Leverage'].max()])
     )
     fig = go.Figure(data=[trace], layout=layout)
-    fig.update_yaxes(tickformat='%')
+    fig.update_yaxes(tickformat='%.0F')
     return fig
 
 # رابط کاربری Streamlit
@@ -72,7 +72,7 @@ st.title("محاسبه ی حباب صندوق های اهرمی و ضریب اه
 option = st.sidebar.radio("لطفاً یکی از گزینه‌های زیر را انتخاب کنید:", ("طلا", "اهرم"))
 
 df = load_data(option)
-df = df.round(2)
+df = df.round(3)
 if df is not None:
     st.write(df)
 
