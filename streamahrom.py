@@ -43,8 +43,9 @@ def create_hobab_plot(df):
         xaxis=dict(title='نماد'),
         yaxis=dict(title='حباب', range=[min_value, df['hobab'].max()])
     )
-
-    return go.Figure(data=[trace], layout=layout)
+    fig = go.Figure(data=[trace], layout=layout)
+    fig.update_yaxes(tickformat='%')
+    return fig
 
 # ایجاد نمودار اهرم
 def create_leverage_plot(df):
@@ -62,8 +63,9 @@ def create_leverage_plot(df):
         xaxis=dict(title='نماد'),
         yaxis=dict(title='اهرم', range=[min_value, df['Leverage'].max()])
     )
-
-    return go.Figure(data=[trace], layout=layout)
+    fig = go.Figure(data=[trace], layout=layout)
+    fig.update_yaxes(tickformat='%')
+    return fig
 
 # رابط کاربری Streamlit
 st.title("محاسبه ی حباب صندوق های اهرمی و ضریب اهرمی صندوق ها")
