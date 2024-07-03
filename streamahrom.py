@@ -36,7 +36,7 @@ st.write(df)
 
 def make_hobab_plot():
     x = df['nemad']
-    if option == "طلا"
+    if option == "طلا":
         y = df['hobab_percentage']
     elif option == "اهرم":
         y = df['hobab']
