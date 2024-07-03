@@ -53,7 +53,7 @@ def make_hobab_plot():
 
     return p
 
-# تابع برای ایجاد نمودار 'Leverage' با محور y ثانویه
+
 def make_leverage_plot():
     x = df['nemad']
     y = df['Leverage']
@@ -69,7 +69,7 @@ def make_leverage_plot():
     return p
 
 # نمایش عنوان و نمودارها با استفاده از Streamlit
-st.title("محاسبه ی حباب صندوق های اهرمی و ضریب اهرمی صندوق ها")
+#st.title("محاسبه ی حباب صندوق های اهرمی و ضریب اهرمی صندوق ها")
 st.write("را بزنید rerun برای به روز رسانی نمودار هر چند دقیقه یکبار گزینه ی ")
 
 # ایجاد نمودارها
