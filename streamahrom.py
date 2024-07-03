@@ -44,21 +44,22 @@ df.set_index(df['nemad'])
 
 
 def make_plot():
-    
     x = df['nemad']
-    y = df['hobab']
+    y1 = df['hobab']
+    y2 = df['leverage']
 
-    
-    p = figure(x_range=x, outer_height=350, title="حباب صندوق",
-               toolbar_location=None, tools="")
+    # ایجاد نمودار با استفاده از Bokeh
+    p = figure(x_range=x, height=350, title="حباب صندوق و اهرم کلاسیک",
+               toolbar_location=None, tools="", width=600)
 
-    p.vbar(x=x, top=y, width=0.5)
+    # اضافه کردن میله‌های عمودی برای هر دو ستون
+    p.vbar(x=[i for i in range(len(x))], top=y1, width=0.4, color="blue", legend_label="Hobab", position="dodge", name="hobab")
+    p.vbar(x=[i + 0.4 for i in range(len(x))], top=y2, width=0.4, color="green", legend_label="leverage", position="dodge", name="leverage")
 
     p.xgrid.grid_line_color = None
     p.y_range.start = 0
-
-    return p
-
+    p.xaxis.major_label_orientation = 1
+    p.legend.location = "top_left"
 
 # In[20]:
 
@@ -69,7 +70,8 @@ plot = make_plot()
 # In[21]:
 
 
-st.title("محاسبه ی حباب صندوق های اهرمی  ")
+st.title("محاسبه ی حباب صندوق های اهرمی  و ضریب اهرمی صندوق ها ")
+st.write("را بزنید rerun برای به روز رسانی نمودار هر چند دقیقه یکبار گزینه ی ")
 
 st.write(df)
 
