@@ -29,6 +29,8 @@ def load_data(option):
 
 # ایجاد نمودار حباب
 def create_hobab_plot(df):
+    min_value = df['hobab'].min()
+
     trace = go.Bar(
         x=df['nemad'],
         y=df['hobab'],
@@ -39,13 +41,15 @@ def create_hobab_plot(df):
     layout = go.Layout(
         title='حباب صندوق',
         xaxis=dict(title='نماد'),
-        yaxis=dict(title='حباب')
+        yaxis=dict(title='حباب', range=[min_value, df['hobab'].max()])
     )
 
     return go.Figure(data=[trace], layout=layout)
 
 # ایجاد نمودار اهرم
 def create_leverage_plot(df):
+    min_value = df['Leverage'].min()
+
     trace = go.Bar(
         x=df['nemad'],
         y=df['Leverage'],
@@ -56,7 +60,7 @@ def create_leverage_plot(df):
     layout = go.Layout(
         title='اهرم صندوق',
         xaxis=dict(title='نماد'),
-        yaxis=dict(title='اهرم')
+        yaxis=dict(title='اهرم', range=[min_value, df['Leverage'].max()])
     )
 
     return go.Figure(data=[trace], layout=layout)
