@@ -36,7 +36,7 @@ st.write(df)
 
 def make_hobab_plot():
     x = df['nemad']
-    y = df['hobab]
+    y = df['hobab']
 
     p = figure(x_range=x, height=350, title="حباب صندوق",
                toolbar_location=None, tools="", width=600)
