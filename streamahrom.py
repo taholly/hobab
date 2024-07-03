@@ -29,7 +29,7 @@ def load_data(option):
 
 # ایجاد نمودار حباب
 def create_hobab_plot(df):
-    min_value = df['hobab'].min()
+    min_value = min(df['hobab'].min() , 0)
 
     trace = go.Bar(
         x=df['nemad'],
@@ -49,7 +49,7 @@ def create_hobab_plot(df):
 
 # ایجاد نمودار اهرم
 def create_leverage_plot(df):
-    min_value = df['Leverage'].min()
+    min_value = min(df['Leverage'].min() , 0)
 
     trace = go.Bar(
         x=df['nemad'],
