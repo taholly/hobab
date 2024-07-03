@@ -53,8 +53,8 @@ def make_plot():
                toolbar_location=None, tools="", width=600)
 
     # اضافه کردن میله‌های عمودی برای هر دو ستون
-    p.vbar(x=[i for i in range(len(x))], top=y1, width=0.4, color="blue", legend_label="Hobab", name="hobab", align="center")
-    p.vbar(x=[i + 0.4 for i in range(len(x))], top=y2, width=0.4, color="green", legend_label="Leverage", name="Leverage", align="center")
+    p.vbar(x=[i for i in range(len(x))], top=y1, width=0.4, color="blue", legend_label="Hobab")
+    p.vbar(x=[i + 0.4 for i in range(len(x))], top=y2, width=0.4, color="green", legend_label="Leverage")
 
 
     p.xgrid.grid_line_color = None
