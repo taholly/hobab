@@ -44,7 +44,7 @@ def make_hobab_plot():
     p = figure(x_range=x, height=350, title="حباب صندوق",
                toolbar_location=None, tools="", width=600)
 
-    p.vbar(x=[i for i in range(len(x))], top=y, width=0.4, color="blue")
+    p.vbar(x=[i for i in range(-len(x),len(x))], top=y, width=0.4, color="blue")
 
     p.xgrid.grid_line_color = None
     p.y_range.start = 0
