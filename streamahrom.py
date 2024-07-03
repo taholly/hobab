@@ -36,10 +36,7 @@ st.write(df)
 
 def make_hobab_plot():
     x = df['nemad']
-    if option == "طلا":
-        y = df['hobab_percentage']
-    elif option == "اهرم":
-        y = df['hobab']
+    y = df['hobab]
 
     p = figure(x_range=x, height=350, title="حباب صندوق",
                toolbar_location=None, tools="", width=600)
@@ -47,7 +44,7 @@ def make_hobab_plot():
     p.vbar(x=[i for i in range(len(x))], top=y, width=0.4, color="blue")
 
     p.xgrid.grid_line_color = None
-    p.y_range.start = -0.1
+    p.y_range.start = min(df['hobab].min() , 0)
     p.xaxis.major_label_orientation = 1
    
 
