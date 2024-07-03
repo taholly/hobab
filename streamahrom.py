@@ -78,5 +78,4 @@ st.write(df)
 
 st.bokeh_chart(plot, use_container_width=True)
 
-
 st.write("Produced By Taha Sadeghizadeh")
