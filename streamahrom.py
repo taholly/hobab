@@ -44,7 +44,7 @@ def make_hobab_plot():
     p.vbar(x=[i for i in range(len(x))], top=y, width=0.4, color="blue")
 
     p.xgrid.grid_line_color = None
-    p.y_range.start = min(df['hobab].min() , 0)
+    p.y_range.start = min(df['hobab'].min() , 0)
     p.xaxis.major_label_orientation = 1
    
 
