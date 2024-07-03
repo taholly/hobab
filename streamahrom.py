@@ -2,77 +2,81 @@ import pandas as pd
 import requests
 from io import BytesIO
 import streamlit as st
-from bokeh.plotting import figure
-from bokeh.models import FactorRange
-
-# ایجاد گزینه‌های انتخاب در نوار کناری
-option = st.sidebar.radio("لطفاً یکی از گزینه‌های زیر را انتخاب کنید:", ("طلا", "اهرم"))
-
-# انتخاب فایل بر اساس گزینه انتخاب شده
-if option == "طلا":
-    fi = "tala.xlsx"
-else:
-    fi = "ahromi"
+import plotly.graph_objs as go
 
 # بارگذاری داده‌ها از URL
-url = f'https://raw.githubusercontent.com/taholly/hobab/main/{fi}'
-response = requests.get(url)
+def load_data(option):
+    if option == "طلا":
+        fi = "tala.xlsx"
+    else:
+        fi = "ahromi"
 
-if response.status_code == 200:
-    file = BytesIO(response.content)
-    try:
-        df = pd.read_excel(file, engine='openpyxl')
-        st.write("Dataframe loaded successfully:")
-    except Exception as e:
-        st.error(f"Error reading the Excel file: {e}")
-else:
-    st.error(f"Failed to retrieve file: {response.status_code}")
+    url = f'https://raw.githubusercontent.com/taholly/hobab/main/{fi}'
+    response = requests.get(url)
 
-# اصلاح نام ستون
-df = df.rename(columns={'Unnamed: 0': "nemad"})
-st.write(df)
+    if response.status_code == 200:
+        file = BytesIO(response.content)
+        try:
+            df = pd.read_excel(file, engine='openpyxl')
+            df = df.rename(columns={'Unnamed: 0': "nemad"})
+            return df
+        except Exception as e:
+            st.error(f"Error reading the Excel file: {e}")
+            return None
+    else:
+        st.error(f"Failed to retrieve file: {response.status_code}")
+        return None
 
-# تابع برای ایجاد نمودار حباب
-def make_hobab_plot():
-    x = list(df['nemad'])
-    y = df['hobab']
+# ایجاد نمودار حباب
+def create_hobab_plot(df):
+    trace = go.Bar(
+        x=df['nemad'],
+        y=df['hobab'],
+        marker=dict(color='blue'),
+        name='حباب صندوق'
+    )
 
-    p = figure(x_range=FactorRange(*x), height=350, title="حباب صندوق",
-               toolbar_location=None, tools="", width=600)
+    layout = go.Layout(
+        title='حباب صندوق',
+        xaxis=dict(title='نماد'),
+        yaxis=dict(title='حباب')
+    )
 
-    p.vbar(x=x, top=y, width=0.4, color="blue")
+    return go.Figure(data=[trace], layout=layout)
 
-    p.xgrid.grid_line_color = None
-    p.y_range.start = min(df['hobab'].min(), 0)
-    p.xaxis.major_label_orientation = 1
+# ایجاد نمودار اهرم
+def create_leverage_plot(df):
+    trace = go.Bar(
+        x=df['nemad'],
+        y=df['Leverage'],
+        marker=dict(color='green'),
+        name='اهرم صندوق'
+    )
 
-    return p
+    layout = go.Layout(
+        title='اهرم صندوق',
+        xaxis=dict(title='نماد'),
+        yaxis=dict(title='اهرم')
+    )
 
-# تابع برای ایجاد نمودار اهرم
-def make_leverage_plot():
-    x = list(df['nemad'])
-    y = df['Leverage']
-    
-    p = figure(x_range=FactorRange(*x), height=350, title="اهرم صندوق",
-               toolbar_location=None, tools="", width=600)
-    p.vbar(x=x, top=y, width=0.4, color="green")
+    return go.Figure(data=[trace], layout=layout)
 
-    p.xgrid.grid_line_color = None
-    p.y_range.start = 0
-    p.xaxis.major_label_orientation = 1
-   
-    return p
+# رابط کاربری Streamlit
+st.title("محاسبه ی حباب صندوق های اهرمی و ضریب اهرمی صندوق ها")
+option = st.sidebar.radio("لطفاً یکی از گزینه‌های زیر را انتخاب کنید:", ("طلا", "اهرم"))
 
-# نمایش عنوان و نمودارها با استفاده از Streamlit
-st.write("برای به روز رسانی نمودار هر چند دقیقه یکبار گزینه 'Rerun' را بزنید.")
+df = load_data(option)
 
-# ایجاد نمودارها
-hobab_plot = make_hobab_plot()
-st.bokeh_chart(hobab_plot, use_container_width=True)
+if df is not None:
+    st.write(df)
 
-# نمایش نمودار اهرم در صورت انتخاب فایل "اهرم"
-if fi == "ahromi":
-    leverage_plot = make_leverage_plot()
-    st.bokeh_chart(leverage_plot, use_container_width=True)
+    # نمایش نمودار حباب
+    hobab_plot = create_hobab_plot(df)
+    st.plotly_chart(hobab_plot)
+
+    # نمایش نمودار اهرم در صورت انتخاب گزینه 'اهرم'
+    if option == "اهرم":
+        leverage_plot = create_leverage_plot(df)
+        st.plotly_chart(leverage_plot)
 
 st.write("Produced By Taha Sadeghizadeh")
