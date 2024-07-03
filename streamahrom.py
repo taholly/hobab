@@ -31,13 +31,12 @@ def make_hobab_plot():
     p = figure(x_range=x, height=350, title="حباب صندوق",
                toolbar_location=None, tools="", width=600)
 
-    p.vbar(x=[i for i in range(len(x))], top=y, width=0.4, color="blue", legend_label="Hobab")
+    p.vbar(x=[i for i in range(len(x))], top=y, width=0.4, color="blue")
 
     p.xgrid.grid_line_color = None
     p.y_range.start = 0
     p.xaxis.major_label_orientation = 1
-    p.legend.location = "top_left"
-    p.legend.orientation = "horizontal"
+   
 
     return p
 
@@ -48,14 +47,12 @@ def make_leverage_plot():
     
     p = figure(x_range=x, height=350, title="اهرم صندوق",
                toolbar_location=None, tools="", width=600)
-    p.vbar(x=[i for i in range(len(x))], top=y, width=0.4, color="green", legend_label="Leverage")
+    p.vbar(x=[i for i in range(len(x))], top=y, width=0.4, color="green")
 
     p.xgrid.grid_line_color = None
     p.y_range.start = 0
     p.xaxis.major_label_orientation = 1
-    p.legend.location = "top_left"
-    p.legend.orientation = "horizontal"
-
+   
     return p
 
 # نمایش عنوان و نمودارها با استفاده از Streamlit
