@@ -14,7 +14,7 @@ if response.status_code == 200:
     try:
         df = pd.read_excel(file, engine='openpyxl')
         st.write("Dataframe loaded successfully:")
-        st.write(df)  # چاپ چند ردیف اول برای بررسی
+        
     except Exception as e:
         st.error(f"Error reading the Excel file: {e}")
 else:
@@ -22,7 +22,7 @@ else:
 
 # اصلاح نام ستون
 df = df.rename(columns={'Unnamed: 0': "nemad"})
-
+st.write(df)  # چاپ چند ردیف اول برای بررسی
 # تابع برای ایجاد نمودار 'hobab'
 def make_hobab_plot():
     x = df['nemad']
