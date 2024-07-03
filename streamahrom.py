@@ -72,7 +72,10 @@ st.title("محاسبه ی حباب صندوق های اهرمی و ضریب اه
 option = st.sidebar.radio("لطفاً یکی از گزینه‌های زیر را انتخاب کنید:", ("طلا", "اهرم"))
 
 df = load_data(option)
-
+m,n = df.shape
+for i in range(m):
+    for j in range(n):
+        df.iloc[i,j] = round( df.iloc[i,j] , ndigits = 2 )
 if df is not None:
     st.write(df)
 
