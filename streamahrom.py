@@ -48,7 +48,7 @@ def make_leverage_plot():
     
     p = figure(x_range=x, height=350, title="اهرم صندوق",
                toolbar_location=None, tools="", width=600)
-    p.vbar(x=[i for i in range(len(x))], top=y, width=0.4, color="blue", legend_label="Hobab")
+    p.vbar(x=[i for i in range(len(x))], top=y, width=0.4, color="purpule", legend_label="Leverage")
 
     p.xgrid.grid_line_color = None
     p.y_range.start = 0
