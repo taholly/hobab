@@ -47,7 +47,7 @@ def create_hobab_plot(df):
         yaxis=dict(title='حباب', range=[min_value, df['hobab'].max()])
     )
     fig = go.Figure(data=[trace], layout=layout)
-    fig.update_yaxes(tickformat='%.0f')
+    fig.update_yaxes(tickformat='.0f')
     return fig
 
 # ایجاد نمودار اهرم
@@ -67,7 +67,7 @@ def create_leverage_plot(df):
         yaxis=dict(title='اهرم', range=[min_value, df['Leverage'].max()])
     )
     fig = go.Figure(data=[trace], layout=layout)
-    fig.update_yaxes(tickformat='%.0f')
+    fig.update_yaxes(tickformat='.0f')
     return fig
 
 # رابط کاربری Streamlit
