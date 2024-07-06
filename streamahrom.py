@@ -72,7 +72,7 @@ def create_leverage_plot(df):
 
 # رابط کاربری Streamlit
 st.title("محاسبه ی حباب صندوق های اهرمی و ضریب اهرمی صندوق ها")
-option = st.sidebar.radio("لطفاً یکی از گزینه‌های زیر را انتخاب کنید:", ("ETF" و"طلا", "اهرم"))
+option = st.sidebar.radio("لطفاً یکی از گزینه‌های زیر را انتخاب کنید:", ("ETF" ,"طلا", "اهرم"))
 
 df = load_data(option)
 df = df.round(3)
