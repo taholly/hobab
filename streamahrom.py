@@ -29,22 +29,7 @@ def load_data(option):
         st.error(f"Failed to retrieve file: {response.status_code}")
         return None
 
-# ایجاد نمودار حباب
-def create_hobab_plot(df):
-    trace = go.Bar(
-        x=df['nemad'],
-        y=df['hobab'],
-        marker=dict(color='blue'),
-        name='حباب صندوق'
-    )
 
-    layout = go.Layout(
-        title='حباب صندوق',
-        xaxis=dict(title='نماد'),
-        yaxis=dict(title='حباب', tickformat='.2%')  # قالب‌بندی درصدی با دو رقم اعشار
-    )
-    fig = go.Figure(data=[trace], layout=layout)
-    return fig
 
 # ایجاد نمودار اهرم
 def create_leverage_plot(df):
@@ -99,7 +84,5 @@ if df is not None:
         leverage_plot = create_leverage_plot(df)
         st.plotly_chart(leverage_plot)
 
-        scatter_plot = create_scatter_plot(df)
-        st.plotly_chart(scatter_plot)
 
 st.write("Produced By Taha Sadeghizadeh")
