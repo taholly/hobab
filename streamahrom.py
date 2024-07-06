@@ -58,7 +58,7 @@ def create_leverage_plot(df):
     layout = go.Layout(
         title='اهرم صندوق',
         xaxis=dict(title='نماد'),
-        yaxis=dict(title='اهرم', tickformat='.0%')  # قالب‌بندی درصدی بدون اعشار
+        yaxis=dict(title='اهرم', tickformat='.2f')  # قالب‌بندی درصدی بدون اعشار
     )
     fig = go.Figure(data=[trace], layout=layout)
     return fig
