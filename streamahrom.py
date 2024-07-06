@@ -7,13 +7,13 @@ import plotly.graph_objs as go
 # بارگذاری داده‌ها از URL
 def load_data(option):
     if option == "طلا":
-        fi = "tala.xlsx"
+        file_name = "tala.xlsx"
     elif option == "اهرم":
-        fi = "ahromi"
+        file_name = "ahromi"
     else:
-        fi = "ETF.xlsx"
+        file_name = "ETF.xlsx"
 
-    url = f'https://raw.githubusercontent.com/taholly/hobab/main/{fi}'
+    url = f'https://raw.githubusercontent.com/taholly/hobab/main/{file_name}'
     response = requests.get(url)
 
     if response.status_code == 200:
@@ -28,12 +28,9 @@ def load_data(option):
     else:
         st.error(f"Failed to retrieve file: {response.status_code}")
         return None
-#df = df.reindex(df['nemad'])
-#df = df.pop(df['nemad'])
+
 # ایجاد نمودار حباب
 def create_hobab_plot(df):
-    min_value = min(df['hobab'].min() , 0)
-
     trace = go.Bar(
         x=df['nemad'],
         y=df['hobab'],
@@ -44,16 +41,13 @@ def create_hobab_plot(df):
     layout = go.Layout(
         title='حباب صندوق',
         xaxis=dict(title='نماد'),
-        yaxis=dict(title='حباب', range=[min_value, df['hobab'].max()])
+        yaxis=dict(title='حباب', tickformat='.2%')  # قالب‌بندی درصدی با دو رقم اعشار
     )
     fig = go.Figure(data=[trace], layout=layout)
-    fig.update_yaxes(tickformat='.2%')
     return fig
 
 # ایجاد نمودار اهرم
 def create_leverage_plot(df):
-    min_value = min(df['Leverage'].min() , 0)
-
     trace = go.Bar(
         x=df['nemad'],
         y=df['Leverage'],
@@ -64,29 +58,48 @@ def create_leverage_plot(df):
     layout = go.Layout(
         title='اهرم صندوق',
         xaxis=dict(title='نماد'),
-        yaxis=dict(title='اهرم', range=[min_value, df['Leverage'].max()])
+        yaxis=dict(title='اهرم', tickformat='.0%')  # قالب‌بندی درصدی بدون اعشار
     )
     fig = go.Figure(data=[trace], layout=layout)
-    fig.update_yaxes(tickformat='.2%')
+    return fig
+
+# ایجاد نمودار پراکندگی
+def create_scatter_plot(df):
+    trace = go.Scatter(
+        x=df['Leverage'],
+        y=df['hobab'],
+        mode='markers',
+        marker=dict(size=10, color='red'),
+        name='حباب در مقابل اهرم'
+    )
+
+    layout = go.Layout(
+        title='حباب در مقابل اهرم',
+        xaxis=dict(title='اهرم'),
+        yaxis=dict(title='حباب', tickformat='.2%')  # قالب‌بندی درصدی با دو رقم اعشار
+    )
+    fig = go.Figure(data=[trace], layout=layout)
     return fig
 
 # رابط کاربری Streamlit
-
-option = st.sidebar.radio("لطفاً یکی از گزینه‌های زیر را انتخاب کنید:", ("ETF" ,"طلا", "اهرم"))
+option = st.sidebar.radio("لطفاً یکی از گزینه‌های زیر را انتخاب کنید:", ("ETF", "طلا", "اهرم"))
 st.title(f"محاسبه ی حباب صندوق های {option}")
 
 df = load_data(option)
-df = df.round(3)
 if df is not None:
+    df = df.round(3)
     st.write(df)
 
     # نمایش نمودار حباب
     hobab_plot = create_hobab_plot(df)
     st.plotly_chart(hobab_plot)
 
-    # نمایش نمودار اهرم در صورت انتخاب گزینه 'اهرم'
+    # نمایش نمودار اهرم و پراکندگی در صورت انتخاب گزینه 'اهرم'
     if option == "اهرم":
         leverage_plot = create_leverage_plot(df)
         st.plotly_chart(leverage_plot)
+
+        scatter_plot = create_scatter_plot(df)
+        st.plotly_chart(scatter_plot)
 
 st.write("Produced By Taha Sadeghizadeh")
