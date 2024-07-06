@@ -28,8 +28,8 @@ def load_data(option):
     else:
         st.error(f"Failed to retrieve file: {response.status_code}")
         return None
-df = df.reindex(df['nemad'])
-df = df.pop(df['nemad'])
+#df = df.reindex(df['nemad'])
+#df = df.pop(df['nemad'])
 # ایجاد نمودار حباب
 def create_hobab_plot(df):
     min_value = min(df['hobab'].min() , 0)
