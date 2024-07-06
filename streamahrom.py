@@ -8,8 +8,10 @@ import plotly.graph_objs as go
 def load_data(option):
     if option == "طلا":
         fi = "tala.xlsx"
-    else:
+    elif option == "اهرم":
         fi = "ahromi"
+    else:
+        fi = "ETF.xlsx"
 
     url = f'https://raw.githubusercontent.com/taholly/hobab/main/{fi}'
     response = requests.get(url)
@@ -26,7 +28,8 @@ def load_data(option):
     else:
         st.error(f"Failed to retrieve file: {response.status_code}")
         return None
-
+df = df.reindex(df['nemad'])
+df = df.pop(df['nemad'])
 # ایجاد نمودار حباب
 def create_hobab_plot(df):
     min_value = min(df['hobab'].min() , 0)
@@ -69,7 +72,7 @@ def create_leverage_plot(df):
 
 # رابط کاربری Streamlit
 st.title("محاسبه ی حباب صندوق های اهرمی و ضریب اهرمی صندوق ها")
-option = st.sidebar.radio("لطفاً یکی از گزینه‌های زیر را انتخاب کنید:", ("طلا", "اهرم"))
+option = st.sidebar.radio("لطفاً یکی از گزینه‌های زیر را انتخاب کنید:", ("ETF" و"طلا", "اهرم"))
 
 df = load_data(option)
 df = df.round(3)
