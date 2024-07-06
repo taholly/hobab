@@ -47,7 +47,7 @@ def create_hobab_plot(df):
         yaxis=dict(title='حباب', range=[min_value, df['hobab'].max()])
     )
     fig = go.Figure(data=[trace], layout=layout)
-    fig.update_yaxes(tickformat='.0f')
+    fig.update_yaxes(tickformat='.2f')
     return fig
 
 # ایجاد نمودار اهرم
