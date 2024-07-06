@@ -29,7 +29,22 @@ def load_data(option):
         st.error(f"Failed to retrieve file: {response.status_code}")
         return None
 
+# ایجاد نمودار حباب
+def create_hobab_plot(df):
+    trace = go.Bar(
+        x=df['nemad'],
+        y=df['hobab'],
+        marker=dict(color='blue'),
+        name='حباب صندوق'
+    )
 
+    layout = go.Layout(
+        title='حباب صندوق',
+        xaxis=dict(title='نماد'),
+        yaxis=dict(title='حباب', tickformat='.2%')  # قالب‌بندی درصدی با دو رقم اعشار
+    )
+    fig = go.Figure(data=[trace], layout=layout)
+    return fig
 
 # ایجاد نمودار اهرم
 def create_leverage_plot(df):
@@ -43,28 +58,12 @@ def create_leverage_plot(df):
     layout = go.Layout(
         title='اهرم صندوق',
         xaxis=dict(title='نماد'),
-        yaxis=dict(title='اهرم', tickformat='.2f')  # قالب‌بندی درصدی بدون اعشار
+        yaxis=dict(title='اهرم', tickformat='.0%')  # قالب‌بندی درصدی بدون اعشار
     )
     fig = go.Figure(data=[trace], layout=layout)
     return fig
 
-# ایجاد نمودار پراکندگی
-def create_scatter_plot(df):
-    trace = go.Scatter(
-        x=df['Leverage'],
-        y=df['hobab'],
-        mode='markers',
-        marker=dict(size=10, color='red'),
-        name='حباب در مقابل اهرم'
-    )
 
-    layout = go.Layout(
-        title='حباب در مقابل اهرم',
-        xaxis=dict(title='اهرم'),
-        yaxis=dict(title='حباب', tickformat='.2%')  # قالب‌بندی درصدی با دو رقم اعشار
-    )
-    fig = go.Figure(data=[trace], layout=layout)
-    return fig
 
 # رابط کاربری Streamlit
 option = st.sidebar.radio("لطفاً یکی از گزینه‌های زیر را انتخاب کنید:", ("ETF", "طلا", "اهرم"))
@@ -83,6 +82,7 @@ if df is not None:
     if option == "اهرم":
         leverage_plot = create_leverage_plot(df)
         st.plotly_chart(leverage_plot)
+
 
 
 st.write("Produced By Taha Sadeghizadeh")
