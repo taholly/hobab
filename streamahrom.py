@@ -73,7 +73,7 @@ st.title(f"محاسبه ی حباب صندوق های {option}")
 df =load_data(option)
 
 #df2 = df.iloc[:,1:]
-if df2 is not None:
+if df is not None:
     df = df.round(3)
     st.write(df)
 
