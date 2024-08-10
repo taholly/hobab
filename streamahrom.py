@@ -101,7 +101,8 @@ def create_leverage_plot(df):
 option = st.sidebar.radio("لطفاً یکی از گزینه‌های زیر را انتخاب کنید:", ("ETF", "طلا", "اهرم"))
 st.title(f"محاسبه ی حباب صندوق های {option}")
 
-df = load_data(option)
+df = await load_data(option)
+
 df2 = df.iloc[:,1:]
 if df2 is not None:
     df2 = df2.round(3)
