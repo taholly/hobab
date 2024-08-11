@@ -1,7 +1,10 @@
 import asyncio
+import nest_asyncio
 import streamlit as st
 from tsetmc.instruments import Instrument
 import pandas as pd
+
+nest_asyncio.apply()  # استفاده از این برای اجازه دادن به چند حلقه رویداد
 
 async def fetch_data(fund_list):
     dictdf = {}
@@ -51,6 +54,5 @@ def streamlit_main():
     if df is not None:
         st.write(df)
 
-# برای اجرای این تابع در Streamlit از کد زیر استفاده کنید
 if __name__ == '__main__':
     streamlit_main()
