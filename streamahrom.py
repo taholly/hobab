@@ -19,7 +19,7 @@ async def fetch_data(fund_list):
     df = df.T.assign(hobab=(df.T["Price"] - df.T["NAV"]) / df.T["NAV"])
     return df
 
-# تابع برای مدیریت داده‌ها و نمودارها
+# تابع اصلی برای مدیریت داده‌ها
 async def main(option):
     if option == "ETF":
         etf_funds = ["آتیمس", "آساس", "تاراز", "آوا", "ارزش", "نارین", "افق ملت", "الماس", "پیروز", "انار", 
@@ -41,11 +41,7 @@ async def main(option):
 
     return df
 
-# تابع همزمان برای مدیریت Streamlit
-def run_async(option):
-    return asyncio.create_task(main(option))
-
-# تابع اصلی Streamlit
+# تابع برای نمایش Streamlit
 def streamlit_main():
     st.title('بررسی حباب صندوق‌ها')
     
@@ -53,11 +49,7 @@ def streamlit_main():
     option = st.selectbox("انتخاب نوع صندوق", ["ETF", "اهرم", "طلا"])
 
     # اجرای تابع هم‌روند و نمایش داده‌ها
-    df_task = run_async(option)
-    
-    # اجرای درون‌خطی در Streamlit
-    loop = asyncio.get_event_loop()
-    df = loop.run_until_complete(df_task)
+    df = st.experimental_async(main(option))
 
     if df is not None:
         # نمایش داده‌ها
@@ -102,14 +94,3 @@ def streamlit_main():
 
         # نمایش نمودار حباب
         hobab_plot = create_hobab_plot(df)
-        st.plotly_chart(hobab_plot)
-
-        # نمایش نمودار اهرم و پراکندگی در صورت انتخاب گزینه 'اهرم'
-        if option == "اهرم" and 'Leverage' in df.columns:
-            leverage_plot = create_leverage_plot(df)
-            st.plotly_chart(leverage_plot)
-
-    st.write("Produced By Taha Sadeghizadeh")
-
-if __name__ == "__main__":
-    streamlit_main()
