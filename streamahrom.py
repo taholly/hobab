@@ -1,10 +1,7 @@
 import asyncio
-import nest_asyncio
 import streamlit as st
 from tsetmc.instruments import Instrument
 import pandas as pd
-
-nest_asyncio.apply()  # استفاده از این برای اجازه دادن به چند حلقه رویداد
 
 async def fetch_data(fund_list):
     dictdf = {}
@@ -41,15 +38,17 @@ async def main(option):
 
     return df
 
-def get_data(option):
-    return asyncio.run(main(option))
+async def get_data(option):
+    return await main(option)
 
 def streamlit_main():
     st.title('بررسی حباب صندوق‌ها')
 
     option = st.selectbox("انتخاب نوع صندوق", ["ETF", "اهرم", "طلا"])
 
-    df = get_data(option)
+    df_task = asyncio.create_task(get_data(option))
+
+    df = asyncio.run(df_task)
     
     if df is not None:
         st.write(df)
