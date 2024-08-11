@@ -7,19 +7,31 @@ from tsetmc.instruments import Instrument
 import asyncio
 import nest_asyncio
 
-dictdf = {}
-gold_funds = ["طلا", "آلتون", "تابش", "جواهر", "زر", "زرفام", "عیار", "کهربا", "گنج", "گوهر", "مثقال", "ناب", "نفیس", "نفیس"]
-for fund in gold_funds:
-    inst = await Instrument.from_search(fund)
-    live = await inst.live_data()
-    price = live['pl']
-    nav = live['nav']
-    time = live['nav_datetime']
-    dictdf[fund] = [fund, price, nav, time] 
-    
-df = pd.DataFrame(dictdf, index=["nemad", 'Price', 'NAV', "Time"])
-df = df.T.assign(hobab=(df.T["Price"] - df.T["NAV"]) / df.T["NAV"])
-st.write(df)
+import streamlit as st
+import asyncio
+import nest_asyncio
+from tsetmc.instruments import Instrument
+import pandas as pd
+
+# تنظیم nest_asyncio برای مدیریت حلقه‌های هم‌روند
+nest_asyncio.apply()
+
+# توابع هم‌روند برای دریافت داده‌ها
+
+async def hobab_tala():
+    dictdf = {}
+    gold_funds = ["طلا", "آلتون", "تابش", "جواهر", "زر", "زرفام", "عیار", "کهربا", "گنج", "گوهر", "مثقال", "ناب", "نفیس", "نفیس"]
+    for fund in gold_funds:
+        inst = await Instrument.from_search(fund)
+        live = await inst.live_data()
+        price = live['pl']
+        nav = live['nav']
+        time = live['nav_datetime']
+        dictdf[fund] = [fund, price, nav, time] 
+        
+    df = pd.DataFrame(dictdf, index=["nemad", 'Price', 'NAV', "Time"])
+    df = df.T.assign(hobab=(df.T["Price"] - df.T["NAV"]) / df.T["NAV"])
+    return df
 
 async def hobab_ahrom():
     dictdf = {}
@@ -59,24 +71,27 @@ async def hobab_ETF():
     df = df.T.assign(hobab=(df.T["Price"] - df.T["NAV"]) / df.T["NAV"])
     return df
 
-async def main():
-    # انتخاب نوع صندوق توسط کاربر
-    option = st.selectbox("انتخاب نوع صندوق", ["ETF", "اهرم", "طلا"])
-
-    # اجرای تابع هم‌روند و نمایش داده‌ها
-    if option == "ETF":
-        df = await hobab_ETF()
-    elif option == "اهرم":
-        df = await hobab_ahrom()
+# تابع برای اجرای توابع هم‌روند به‌صورت هم‌زمان
+def run_async_task(task):
+    loop = asyncio.get_event_loop()
+    if loop.is_running():
+        return asyncio.ensure_future(task)
     else:
-        df = await hobab_tala()
+        return loop.run_until_complete(task)
 
-    st.write(df)
+# انتخاب نوع صندوق توسط کاربر
+option = st.selectbox("انتخاب نوع صندوق", ["ETF", "اهرم", "طلا"])
 
+# اجرای تابع هم‌روند و نمایش داده‌ها
+if option == "ETF":
+    df = run_async_task(hobab_ETF())
+elif option == "اهرم":
+    df = run_async_task(hobab_ahrom())
+else:
+    df = run_async_task(hobab_tala())
 
-
-if __name__ == '__main__':
-    asyncio.run(main())
+# نمایش داده‌ها در Streamlit
+st.write(df)
 
 
 # ایجاد نمودار حباب
