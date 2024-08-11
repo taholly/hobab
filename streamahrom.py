@@ -1,79 +1,58 @@
+import asyncio
 import pandas as pd
-import requests
-from io import BytesIO
 import streamlit as st
-import plotly.graph_objs as go
+from tsetmc.instruments import Instrument
 
-# بارگذاری داده‌ها از URL
-def load_data(option):
-    if option == "طلا":
-        file_name = "tala.xlsx"
+# تابع هم‌روند برای دریافت داده‌ها
+async def fetch_data(fund_list):
+    dictdf = {}
+    for fund in fund_list:
+        inst = await Instrument.from_search(fund)
+        live = await inst.live_data()
+        price = live['pl']
+        nav = live['nav']
+        time = live['nav_datetime']
+        dictdf[fund] = [fund, price, nav, time] 
+        
+    df = pd.DataFrame.from_dict(dictdf, orient='index', columns=['nemad', 'Price', 'NAV', 'Time'])
+    df['hobab'] = (df['Price'] - df['NAV']) / df['NAV']
+    return df
+
+# تابع اصلی برای مدیریت داده‌ها
+async def main(option):
+    if option == "ETF":
+        etf_funds = ["آتیمس", "آساس", "تاراز", "آوا", "ارزش", "نارین", "افق ملت", "الماس", "پیروز", "انار", 
+                     "اوج", "بازبیمه", "بهین رو", "پتروآبان", "پتروداریوش", "پتروصبا", "پتروما", "سمان", 
+                     "پتروآگاه", "متال", "رویین", "تخت گاز", "استیل", "فلزفارابی", "آذرین", "بذر", 
+                     "پادا", "پالایش", "پرتو", "کاردان", "ترمه", "اطلس", "ثروتم", "ثمین", "داریوش", 
+                     "ثهام", "هامون", "هیوا", "جاودان", "برلیان", "دریا", "رماس", "زرین", "ثنا", 
+                     "سرو", "سلام", "آبنوس", "ویستا", "اکسیژن", "بیدار", "توان", "جهش", "شتاب", 
+                     "اهرم", "موج", "نارنج اهرم", "سپینود", "تیام", "ثروت ساز", "کاریس", "هوشیار", 
+                     "فیروزه", "آرام", "وبازار", "صدف", "فراز", "فارما کیان", "درسا", "هم وزن", "خلیج", 
+                     "مدیر", "مروارید", "تکپاد", "عقیق", "آگاس", "دارا یکم"]
+        df = await fetch_data(etf_funds)
     elif option == "اهرم":
-        file_name = "ahromi"
+        leveraged_funds = ["اهرم", "توان", "موج", "نارنج اهرم", "شتاب", "جهش", "بیدار"]
+        df = await fetch_data(leveraged_funds)
     else:
-        file_name = "ETF.xlsx"
+        gold_funds = ["طلا", "آلتون", "تابش", "جواهر", "زر", "زرفام", "عیار", "کهربا", "گنج", "گوهر", "مثقال", "ناب", "نفیس", "نفیس"]
+        df = await fetch_data(gold_funds)
 
-    url = f'https://raw.githubusercontent.com/taholly/hobab/main/{file_name}'
-    response = requests.get(url)
+    return df
 
-    if response.status_code == 200:
-        file = BytesIO(response.content)
-        try:
-            df = pd.read_excel(file, engine='openpyxl')
-            df = df.rename(columns={'Unnamed: 0': "nemad"})
-            return df
-        except Exception as e:
-            st.error(f"Error reading the Excel file: {e}")
-            return None
-    else:
-        st.error(f"Failed to retrieve file: {response.status_code}")
-        return None
+# تابع برای اجرای توابع هم‌روند و نمایش داده‌ها در Streamlit
+def get_data(option):
+    return asyncio.run(main(option))
 
-def create_hobab_plot(df):
-    trace = go.Bar(
-        x=df['nemad'],
-        y=df['hobab'],
-        marker=dict(color='blue'),
-        name='حباب صندوق'
-    )
-    layout = go.Layout(
-        title='حباب صندوق',
-        xaxis=dict(title='نماد'),
-        yaxis=dict(title='حباب', tickformat='.2%')  # قالب‌بندی درصدی با دو رقم اعشار
-    )
-    fig = go.Figure(data=[trace], layout=layout)
-    return fig
-# ایجاد نمودار اهرم
-def create_leverage_plot(df):
-    trace = go.Bar(
-        x=df['nemad'],
-        y=df['Leverage'],
-        marker=dict(color='green'),
-        name='اهرم صندوق'
-    )
-    layout = go.Layout(
-        title='اهرم صندوق',
-        xaxis=dict(title='نماد'),
-        yaxis=dict(title='اهرم', tickformat='.2f')  # قالب‌بندی درصدی بدون اعشار
-    )
-    fig = go.Figure(data=[trace], layout=layout)
-    return fig
-# رابط کاربری Streamlit
-option = st.sidebar.radio("لطفاً یکی از گزینه‌های زیر را انتخاب کنید:", ("ETF", "طلا", "اهرم"))
-st.title(f"محاسبه ی حباب صندوق های {option}")
+# تابع برای نمایش Streamlit
+def streamlit_main():
+    st.title('بررسی حباب صندوق‌ها')
 
-df = load_data(option)
-if df is not None:
-    df = df.round(3)
+    # انتخاب نوع صندوق توسط کاربر
+    option = st.selectbox("انتخاب نوع صندوق", ["ETF", "اهرم", "طلا"])
+
+    # اجرای تابع هم‌روند و نمایش داده‌ها
+    df = get_data(option)
+    
     st.write(df)
 
-    # نمایش نمودار حباب
-    hobab_plot = create_hobab_plot(df)
-    st.plotly_chart(hobab_plot)
-
-    # نمایش نمودار اهرم و پراکندگی در صورت انتخاب گزینه 'اهرم'
-    if option == "اهرم":
-        leverage_plot = create_leverage_plot(df)
-        st.plotly_chart(leverage_plot)
-        
-st.write("Produced By Taha Sadeghizadeh")
