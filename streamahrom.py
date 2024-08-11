@@ -94,3 +94,14 @@ def streamlit_main():
 
         # نمایش نمودار حباب
         hobab_plot = create_hobab_plot(df)
+        st.plotly_chart(hobab_plot)
+
+        # نمایش نمودار اهرم و پراکندگی در صورت انتخاب گزینه 'اهرم'
+        if option == "اهرم" and 'Leverage' in df.columns:
+            leverage_plot = create_leverage_plot(df)
+            st.plotly_chart(leverage_plot)
+
+    st.write("Produced By Taha Sadeghizadeh")
+
+if __name__ == "__main__":
+    streamlit_main()
