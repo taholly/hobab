@@ -7,6 +7,18 @@ from tsetmc.instruments import Instrument
 import asyncio
 import nest_asyncio
 
+import streamlit as st
+import asyncio
+import nest_asyncio
+from tsetmc.instruments import Instrument
+import pandas as pd
+
+import streamlit as st
+import asyncio
+import nest_asyncio
+from tsetmc.instruments import Instrument
+import pandas as pd
+
 # تنظیم nest_asyncio برای مدیریت حلقه‌های هم‌روند
 nest_asyncio.apply()
 
@@ -65,16 +77,14 @@ async def hobab_ETF():
     df = df.T.assign(hobab=(df.T["Price"] - df.T["NAV"]) / df.T["NAV"])
     return df
 
-# تابع برای اجرای کد هم‌روند از نخ غیرهم‌روند
-def run_async_function(coro):
-    loop = asyncio.get_event_loop()
-    if loop.is_running():
-        # اجرای تابع هم‌روند با استفاده از asyncio.create_task
-        future = asyncio.run_coroutine_threadsafe(coro, loop)
-        return future.result()
+# استفاده از st.experimental_async برای مدیریت توابع هم‌روند
+async def fetch_data(option):
+    if option == "ETF":
+        return await hobab_ETF()
+    elif option == "اهرم":
+        return await hobab_ahrom()
     else:
-        return loop.run_until_complete(coro)
-
+        return await hobab_tala()
 
 
 
@@ -114,21 +124,14 @@ def create_leverage_plot(df):
     return fig
 
 
-
-
 # انتخاب نوع صندوق توسط کاربر
 option = st.selectbox("انتخاب نوع صندوق", ["ETF", "اهرم", "طلا"])
 
-# اجرای تابع هم‌روند بر اساس گزینه انتخابی و نمایش داده‌ها
-if option == "ETF":
-    df = run_async_function(hobab_ETF())
-elif option == "اهرم":
-    df = run_async_function(hobab_ahrom())
-else:
-    df = run_async_function(hobab_tala())
+# اجرای تابع هم‌روند و نمایش داده‌ها
+df = st.experimental_async(fetch_data(option))
 
 # نمایش داده‌ها در Streamlit
-st.write(df)
+#st.write(df)
 
 
 
