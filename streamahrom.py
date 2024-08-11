@@ -41,7 +41,7 @@ async def main(option):
 
     return df
 
-# تابع برای نمایش Streamlit
+# تابع برای اجرای توابع هم‌روند و نمایش داده‌ها در Streamlit
 def streamlit_main():
     st.title('بررسی حباب صندوق‌ها')
     
@@ -49,7 +49,9 @@ def streamlit_main():
     option = st.selectbox("انتخاب نوع صندوق", ["ETF", "اهرم", "طلا"])
 
     # اجرای تابع هم‌روند و نمایش داده‌ها
-    df = st.experimental_async(main(option))
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    df = loop.run_until_complete(main(option))
 
     if df is not None:
         # نمایش داده‌ها
