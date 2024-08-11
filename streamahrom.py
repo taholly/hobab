@@ -1,20 +1,16 @@
 import pandas as pd
 import requests
 from io import BytesIO
-import streamlit as st
 import plotly.graph_objs as go
 import streamlit as st
-import asyncio
 from tsetmc.instruments import Instrument
-import pandas as pd
-import streamlit as st
 import asyncio
 import nest_asyncio
-from tsetmc.instruments import Instrument
-import pandas as pd
 
-# استفاده از nest_asyncio برای تنظیم حلقه‌های هم‌روند
+# تنظیم nest_asyncio برای مدیریت حلقه‌های هم‌روند
 nest_asyncio.apply()
+
+# توابع هم‌روند برای دریافت داده‌ها
 
 async def hobab_tala():
     dictdf = {}
@@ -69,15 +65,16 @@ async def hobab_ETF():
     df = df.T.assign(hobab=(df.T["Price"] - df.T["NAV"]) / df.T["NAV"])
     return df
 
+# تابع برای اجرای کد هم‌روند از نخ غیرهم‌روند
 def run_async_function(coro):
     loop = asyncio.get_event_loop()
     if loop.is_running():
-        # اگر حلقه هم‌روند در حال اجراست، از `asyncio.create_task` استفاده می‌کنیم
-        task = asyncio.create_task(coro)
-        return loop.run_until_complete(task)
+        # اجرای تابع هم‌روند با استفاده از asyncio.create_task
+        future = asyncio.run_coroutine_threadsafe(coro, loop)
+        return future.result()
     else:
-        # اگر حلقه هم‌روند در حال اجرا نیست، از `loop.run_until_complete` استفاده می‌کنیم
         return loop.run_until_complete(coro)
+
 
 
 
@@ -130,6 +127,8 @@ elif option == "اهرم":
 else:
     df = run_async_function(hobab_tala())
 
+# نمایش داده‌ها در Streamlit
+st.write(df)
 
 
 
