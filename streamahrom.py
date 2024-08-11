@@ -8,53 +8,44 @@ import asyncio
 import nest_asyncio
 
 import streamlit as st
-import asyncio
-import nest_asyncio
-from tsetmc.instruments import Instrument
+import requests
 import pandas as pd
-
-import streamlit as st
-import asyncio
-import nest_asyncio
 from tsetmc.instruments import Instrument
-import pandas as pd
 
-# تنظیم nest_asyncio برای مدیریت حلقه‌های هم‌روند
-nest_asyncio.apply()
+# توابع غیرهم‌روند برای دریافت داده‌ها
 
-# توابع هم‌روند برای دریافت داده‌ها
+def fetch_data(fund):
+    # تغییر تابع برای استفاده از توابع غیرهم‌روندی
+    inst = Instrument.from_search_sync(fund)
+    live = inst.live_data_sync()
+    price = live['pl']
+    nav = live['nav']
+    time = live['nav_datetime']
+    return fund, price, nav, time
 
-async def hobab_tala():
+def hobab_tala():
     dictdf = {}
     gold_funds = ["طلا", "آلتون", "تابش", "جواهر", "زر", "زرفام", "عیار", "کهربا", "گنج", "گوهر", "مثقال", "ناب", "نفیس", "نفیس"]
     for fund in gold_funds:
-        inst = await Instrument.from_search(fund)
-        live = await inst.live_data()
-        price = live['pl']
-        nav = live['nav']
-        time = live['nav_datetime']
+        fund, price, nav, time = fetch_data(fund)
         dictdf[fund] = [fund, price, nav, time] 
         
     df = pd.DataFrame(dictdf, index=["nemad", 'Price', 'NAV', "Time"])
     df = df.T.assign(hobab=(df.T["Price"] - df.T["NAV"]) / df.T["NAV"])
     return df
 
-async def hobab_ahrom():
+def hobab_ahrom():
     dictdf = {}
     leveraged_funds = ["اهرم", "توان", "موج", "نارنج اهرم", "شتاب", "جهش", "بیدار"]
     for fund in leveraged_funds:
-        inst = await Instrument.from_search(fund)
-        live = await inst.live_data()
-        price = live['pl']
-        nav = live['nav']
-        time = live['nav_datetime']
+        fund, price, nav, time = fetch_data(fund)
         dictdf[fund] = [fund, price, nav, time] 
         
     df = pd.DataFrame(dictdf, index=["nemad", 'Price', 'NAV', "Time"])
     df = df.T.assign(hobab=(df.T["Price"] - df.T["NAV"]) / df.T["NAV"])
     return df
 
-async def hobab_ETF():
+def hobab_ETF():
     dictdf = {}
     etf_funds = ["آتیمس", "آساس", "تاراز", "آوا", "ارزش", "نارین", "افق ملت", "الماس", "پیروز", "انار", 
                  "اوج", "بازبیمه", "بهین رو", "پتروآبان", "پتروداریوش", "پتروصبا", "پتروما", "سمان", 
@@ -66,25 +57,12 @@ async def hobab_ETF():
                  "فیروزه", "آرام", "وبازار", "صدف", "فراز", "فارما کیان", "درسا", "هم وزن", "خلیج", 
                  "مدیر", "مروارید", "تکپاد", "عقیق", "آگاس", "دارا یکم"]
     for fund in etf_funds:
-        inst = await Instrument.from_search(fund)
-        live = await inst.live_data()
-        price = live['pl']
-        nav = live['nav']
-        time = live['nav_datetime']
+        fund, price, nav, time = fetch_data(fund)
         dictdf[fund] = [fund, price, nav, time] 
         
     df = pd.DataFrame(dictdf, index=["nemad", 'Price', 'NAV', "Time"])
     df = df.T.assign(hobab=(df.T["Price"] - df.T["NAV"]) / df.T["NAV"])
     return df
-
-# استفاده از st.experimental_async برای مدیریت توابع هم‌روند
-async def fetch_data(option):
-    if option == "ETF":
-        return await hobab_ETF()
-    elif option == "اهرم":
-        return await hobab_ahrom()
-    else:
-        return await hobab_tala()
 
 
 
@@ -127,12 +105,16 @@ def create_leverage_plot(df):
 # انتخاب نوع صندوق توسط کاربر
 option = st.selectbox("انتخاب نوع صندوق", ["ETF", "اهرم", "طلا"])
 
-# اجرای تابع هم‌روند و نمایش داده‌ها
-df = st.experimental_async(fetch_data(option))
+# اجرای تابع و نمایش داده‌ها
+if option == "ETF":
+    df = hobab_ETF()
+elif option == "اهرم":
+    df = hobab_ahrom()
+else:
+    df = hobab_tala()
 
 # نمایش داده‌ها در Streamlit
-#st.write(df)
-
+st.write(df)
 
 
 
