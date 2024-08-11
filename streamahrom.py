@@ -6,20 +6,20 @@ import streamlit as st
 from tsetmc.instruments import Instrument
 import asyncio
 import nest_asyncio
-async def hobab_tala():
-    dictdf = {}
-    gold_funds = ["طلا", "آلتون", "تابش", "جواهر", "زر", "زرفام", "عیار", "کهربا", "گنج", "گوهر", "مثقال", "ناب", "نفیس", "نفیس"]
-    for fund in gold_funds:
-        inst = await Instrument.from_search(fund)
-        live = await inst.live_data()
-        price = live['pl']
-        nav = live['nav']
-        time = live['nav_datetime']
-        dictdf[fund] = [fund, price, nav, time] 
-        
-    df = pd.DataFrame(dictdf, index=["nemad", 'Price', 'NAV', "Time"])
-    df = df.T.assign(hobab=(df.T["Price"] - df.T["NAV"]) / df.T["NAV"])
-    return df
+
+dictdf = {}
+gold_funds = ["طلا", "آلتون", "تابش", "جواهر", "زر", "زرفام", "عیار", "کهربا", "گنج", "گوهر", "مثقال", "ناب", "نفیس", "نفیس"]
+for fund in gold_funds:
+    inst = await Instrument.from_search(fund)
+    live = await inst.live_data()
+    price = live['pl']
+    nav = live['nav']
+    time = live['nav_datetime']
+    dictdf[fund] = [fund, price, nav, time] 
+    
+df = pd.DataFrame(dictdf, index=["nemad", 'Price', 'NAV', "Time"])
+df = df.T.assign(hobab=(df.T["Price"] - df.T["NAV"]) / df.T["NAV"])
+st.write(df)
 
 async def hobab_ahrom():
     dictdf = {}
