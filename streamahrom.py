@@ -42,8 +42,8 @@ async def main(option):
     return df
 
 # تابع همزمان برای مدیریت Streamlit
-def run_main(option):
-    return asyncio.run(main(option))
+def run_async(option):
+    return asyncio.create_task(main(option))
 
 # تابع اصلی Streamlit
 def streamlit_main():
@@ -53,7 +53,11 @@ def streamlit_main():
     option = st.selectbox("انتخاب نوع صندوق", ["ETF", "اهرم", "طلا"])
 
     # اجرای تابع هم‌روند و نمایش داده‌ها
-    df = run_main(option)
+    df_task = run_async(option)
+    
+    # اجرای درون‌خطی در Streamlit
+    loop = asyncio.get_event_loop()
+    df = loop.run_until_complete(df_task)
 
     if df is not None:
         # نمایش داده‌ها
