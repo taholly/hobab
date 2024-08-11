@@ -12,7 +12,7 @@ async def fetch_data(fund_list):
         nav = live['nav']
         time = live['nav_datetime']
         dictdf[fund] = [fund, price, nav, time] 
-        
+
     df = pd.DataFrame(dictdf, index=["nemad", 'Price', 'NAV', "Time"])
     df = df.T.assign(hobab=(df.T["Price"] - df.T["NAV"]) / df.T["NAV"])
     return df
@@ -38,17 +38,14 @@ async def main(option):
 
     return df
 
-async def get_data(option):
-    return await main(option)
-
 def streamlit_main():
     st.title('بررسی حباب صندوق‌ها')
 
     option = st.selectbox("انتخاب نوع صندوق", ["ETF", "اهرم", "طلا"])
 
-    df_task = asyncio.create_task(get_data(option))
-
-    df = asyncio.run(df_task)
+    # ایجاد حلقه رویداد و اجرای تابع async
+    loop = asyncio.get_event_loop()
+    df = loop.run_until_complete(main(option))
     
     if df is not None:
         st.write(df)
