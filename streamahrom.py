@@ -16,8 +16,8 @@ from tsetmc.instruments import Instrument
 
 def fetch_data(fund):
     # تغییر تابع برای استفاده از توابع غیرهم‌روندی
-    inst = Instrument.from_search_sync(fund)
-    live = inst.live_data_sync()
+    inst = Instrument.from_search(fund)
+    live = inst.live_data()
     price = live['pl']
     nav = live['nav']
     time = live['nav_datetime']
