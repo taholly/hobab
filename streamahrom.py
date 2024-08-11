@@ -45,9 +45,11 @@ async def main(option):
 
     return df
 
-# تابع برای اجرای توابع هم‌روند و نمایش داده‌ها در Streamlit
-def get_data(option):
-    return asyncio.run(main(option))
+# تابع برای اجرای توابع هم‌زمان و نمایش داده‌ها در Streamlit
+def run_async_func(async_func, *args):
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    return loop.run_until_complete(async_func(*args))
 
 # تابع برای نمایش Streamlit
 def streamlit_main():
@@ -58,7 +60,7 @@ def streamlit_main():
 
     # اجرای تابع هم‌روند و نمایش داده‌ها
     try:
-        df = get_data(option)
+        df = run_async_func(main, option)
         st.write(df)
     except Exception as e:
         st.error(f"An error occurred: {e}")
