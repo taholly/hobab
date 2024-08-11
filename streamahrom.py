@@ -2,17 +2,22 @@ import asyncio
 import pandas as pd
 import streamlit as st
 from tsetmc.instruments import Instrument
+from aiohttp import ClientError
 
 # تابع هم‌روند برای دریافت داده‌ها
 async def fetch_data(fund_list):
     dictdf = {}
     for fund in fund_list:
-        inst = await Instrument.from_search(fund)
-        live = await inst.live_data()
-        price = live.get('pl', None)
-        nav = live.get('nav', None)
-        time = live.get('nav_datetime', None)
-        dictdf[fund] = [fund, price, nav, time]
+        try:
+            inst = await Instrument.from_search(fund)
+            live = await inst.live_data()
+            price = live.get('pl', None)
+            nav = live.get('nav', None)
+            time = live.get('nav_datetime', None)
+            dictdf[fund] = [fund, price, nav, time]
+        except ClientError as e:
+            print(f"Error fetching data for {fund}: {e}")
+            dictdf[fund] = [fund, None, None, None]
         
     df = pd.DataFrame.from_dict(dictdf, orient='index', columns=['nemad', 'Price', 'NAV', 'Time'])
     df['hobab'] = (df['Price'] - df['NAV']) / df['NAV']
@@ -42,7 +47,10 @@ async def main(option):
 
 # تابع برای اجرای توابع هم‌روند و نمایش داده‌ها در Streamlit
 def get_data(option):
-    return asyncio.run(main(option))
+    loop = asyncio.get_event_loop()
+    task = loop.create_task(main(option))
+    df = loop.run_until_complete(task)
+    return df
 
 # تابع برای نمایش Streamlit
 def streamlit_main():
@@ -52,9 +60,11 @@ def streamlit_main():
     option = st.selectbox("انتخاب نوع صندوق", ["ETF", "اهرم", "طلا"])
 
     # اجرای تابع هم‌روند و نمایش داده‌ها
-    df = get_data(option)
-    
-    st.write(df)
+    try:
+        df = get_data(option)
+        st.write(df)
+    except Exception as e:
+        st.error(f"An error occurred: {e}")
 
 if __name__ == "__main__":
     streamlit_main()
