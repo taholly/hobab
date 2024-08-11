@@ -9,10 +9,10 @@ async def fetch_data(fund_list):
     for fund in fund_list:
         inst = await Instrument.from_search(fund)
         live = await inst.live_data()
-        price = live['pl']
-        nav = live['nav']
-        time = live['nav_datetime']
-        dictdf[fund] = [fund, price, nav, time] 
+        price = live.get('pl', None)
+        nav = live.get('nav', None)
+        time = live.get('nav_datetime', None)
+        dictdf[fund] = [fund, price, nav, time]
         
     df = pd.DataFrame.from_dict(dictdf, orient='index', columns=['nemad', 'Price', 'NAV', 'Time'])
     df['hobab'] = (df['Price'] - df['NAV']) / df['NAV']
@@ -56,3 +56,5 @@ def streamlit_main():
     
     st.write(df)
 
+if __name__ == "__main__":
+    streamlit_main()
