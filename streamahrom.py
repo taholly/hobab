@@ -8,44 +8,47 @@ import asyncio
 import nest_asyncio
 
 import streamlit as st
-import requests
-import pandas as pd
+import asyncio
+import nest_asyncio
 from tsetmc.instruments import Instrument
+import pandas as pd
 
-# توابع غیرهم‌روند برای دریافت داده‌ها
+# تنظیم nest_asyncio برای مدیریت حلقه‌های هم‌روند
+nest_asyncio.apply()
 
-def fetch_data(fund):
-    # تغییر تابع برای استفاده از توابع غیرهم‌روندی
-    inst = Instrument.from_search(fund)
-    live = inst.live_data()
-    price = live['pl']
-    nav = live['nav']
-    time = live['nav_datetime']
-    return fund, price, nav, time
+# توابع هم‌روند برای دریافت داده‌ها
 
-def hobab_tala():
+async def hobab_tala():
     dictdf = {}
     gold_funds = ["طلا", "آلتون", "تابش", "جواهر", "زر", "زرفام", "عیار", "کهربا", "گنج", "گوهر", "مثقال", "ناب", "نفیس", "نفیس"]
     for fund in gold_funds:
-        fund, price, nav, time = fetch_data(fund)
+        inst = await Instrument.from_search(fund)
+        live = await inst.live_data()
+        price = live['pl']
+        nav = live['nav']
+        time = live['nav_datetime']
         dictdf[fund] = [fund, price, nav, time] 
         
     df = pd.DataFrame(dictdf, index=["nemad", 'Price', 'NAV', "Time"])
     df = df.T.assign(hobab=(df.T["Price"] - df.T["NAV"]) / df.T["NAV"])
     return df
 
-def hobab_ahrom():
+async def hobab_ahrom():
     dictdf = {}
     leveraged_funds = ["اهرم", "توان", "موج", "نارنج اهرم", "شتاب", "جهش", "بیدار"]
     for fund in leveraged_funds:
-        fund, price, nav, time = fetch_data(fund)
+        inst = await Instrument.from_search(fund)
+        live = await inst.live_data()
+        price = live['pl']
+        nav = live['nav']
+        time = live['nav_datetime']
         dictdf[fund] = [fund, price, nav, time] 
         
     df = pd.DataFrame(dictdf, index=["nemad", 'Price', 'NAV', "Time"])
     df = df.T.assign(hobab=(df.T["Price"] - df.T["NAV"]) / df.T["NAV"])
     return df
 
-def hobab_ETF():
+async def hobab_ETF():
     dictdf = {}
     etf_funds = ["آتیمس", "آساس", "تاراز", "آوا", "ارزش", "نارین", "افق ملت", "الماس", "پیروز", "انار", 
                  "اوج", "بازبیمه", "بهین رو", "پتروآبان", "پتروداریوش", "پتروصبا", "پتروما", "سمان", 
@@ -57,12 +60,24 @@ def hobab_ETF():
                  "فیروزه", "آرام", "وبازار", "صدف", "فراز", "فارما کیان", "درسا", "هم وزن", "خلیج", 
                  "مدیر", "مروارید", "تکپاد", "عقیق", "آگاس", "دارا یکم"]
     for fund in etf_funds:
-        fund, price, nav, time = fetch_data(fund)
+        inst = await Instrument.from_search(fund)
+        live = await inst.live_data()
+        price = live['pl']
+        nav = live['nav']
+        time = live['nav_datetime']
         dictdf[fund] = [fund, price, nav, time] 
         
     df = pd.DataFrame(dictdf, index=["nemad", 'Price', 'NAV', "Time"])
     df = df.T.assign(hobab=(df.T["Price"] - df.T["NAV"]) / df.T["NAV"])
     return df
+
+# تابع برای اجرای توابع هم‌روند به‌صورت هم‌زمان
+def run_async_task(task):
+    loop = asyncio.get_event_loop()
+    if loop.is_running():
+        return asyncio.ensure_future(task)
+    else:
+        return loop.run_until_complete(task)
 
 
 
@@ -102,19 +117,21 @@ def create_leverage_plot(df):
     return fig
 
 
+
 # انتخاب نوع صندوق توسط کاربر
 option = st.selectbox("انتخاب نوع صندوق", ["ETF", "اهرم", "طلا"])
 
-# اجرای تابع و نمایش داده‌ها
+# اجرای تابع هم‌روند و نمایش داده‌ها
 if option == "ETF":
-    df = hobab_ETF()
+    df = run_async_task(hobab_ETF())
 elif option == "اهرم":
-    df = hobab_ahrom()
+    df = run_async_task(hobab_ahrom())
 else:
-    df = hobab_tala()
+    df = run_async_task(hobab_tala())
 
 # نمایش داده‌ها در Streamlit
 st.write(df)
+
 
 
 
