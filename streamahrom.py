@@ -8,6 +8,14 @@ import asyncio
 from tsetmc.instruments import Instrument
 import pandas as pd
 
+import streamlit as st
+import asyncio
+import nest_asyncio
+from tsetmc.instruments import Instrument
+import pandas as pd
+
+nest_asyncio.apply()  # این خط کد حلقه‌های هم‌روند را نست می‌کند
+
 async def hobab_tala():
     dictdf = {}
     gold_funds = ["طلا", "آلتون", "تابش", "جواهر", "زر", "زرفام", "عیار", "کهربا", "گنج", "گوهر", "مثقال", "ناب", "نفیس", "نفیس"]
@@ -60,8 +68,7 @@ async def hobab_ETF():
     df = df.T.assign(hobab=(df.T["Price"] - df.T["NAV"]) / df.T["NAV"])
     return df
 
-def run_async_task(task):
-    return asyncio.run(task)
+
 
 
 
@@ -104,18 +111,20 @@ def create_leverage_plot(df):
 # انتخاب نوع صندوق توسط کاربر
 option = st.selectbox("انتخاب نوع صندوق", ["ETF", "اهرم", "طلا"])
 
-# اجرای تابع بر اساس گزینه انتخابی و نمایش داده‌ها
+# اجرای تابع هم‌روند بر اساس گزینه انتخابی و نمایش داده‌ها
 if option == "ETF":
-    df = run_async_task(hobab_ETF())
+    df = asyncio.run(hobab_ETF())
 elif option == "اهرم":
-    df = run_async_task(hobab_ahrom())
+    df = asyncio.run(hobab_ahrom())
 else:
-    df = run_async_task(hobab_tala())
+    df = asyncio.run(hobab_tala())
 
-#df2 = df.iloc[:,1:]
-if df is not None:
-    df = df.round(3)
-    st.write(df)
+
+
+df2 = df.iloc[:,1:]
+if df2 is not None:
+    df2 = df2.round(3)
+    st.write(df2)
 
     # نمایش نمودار حباب
     hobab_plot = create_hobab_plot(df)
