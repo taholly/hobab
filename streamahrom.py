@@ -1,11 +1,11 @@
-import asyncio
 import pandas as pd
 import streamlit as st
 from tsetmc.instruments import Instrument
-from aiohttp import ClientError
+import asyncio
+from concurrent.futures import ThreadPoolExecutor
 
 # تابع هم‌روند برای دریافت داده‌ها
-async def fetch_data(fund_list):
+async def fetch_data_async(fund_list):
     dictdf = {}
     for fund in fund_list:
         try:
@@ -15,7 +15,7 @@ async def fetch_data(fund_list):
             nav = live.get('nav', None)
             time = live.get('nav_datetime', None)
             dictdf[fund] = [fund, price, nav, time]
-        except ClientError as e:
+        except Exception as e:
             print(f"Error fetching data for {fund}: {e}")
             dictdf[fund] = [fund, None, None, None]
         
@@ -23,8 +23,13 @@ async def fetch_data(fund_list):
     df['hobab'] = (df['Price'] - df['NAV']) / df['NAV']
     return df
 
+def fetch_data(fund_list):
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    return loop.run_until_complete(fetch_data_async(fund_list))
+
 # تابع اصلی برای مدیریت داده‌ها
-async def main(option):
+def main(option):
     if option == "ETF":
         etf_funds = ["آتیمس", "آساس", "تاراز", "آوا", "ارزش", "نارین", "افق ملت", "الماس", "پیروز", "انار", 
                      "اوج", "بازبیمه", "بهین رو", "پتروآبان", "پتروداریوش", "پتروصبا", "پتروما", "سمان", 
@@ -35,21 +40,15 @@ async def main(option):
                      "اهرم", "موج", "نارنج اهرم", "سپینود", "تیام", "ثروت ساز", "کاریس", "هوشیار", 
                      "فیروزه", "آرام", "وبازار", "صدف", "فراز", "فارما کیان", "درسا", "هم وزن", "خلیج", 
                      "مدیر", "مروارید", "تکپاد", "عقیق", "آگاس", "دارا یکم"]
-        df = await fetch_data(etf_funds)
+        df = fetch_data(etf_funds)
     elif option == "اهرم":
         leveraged_funds = ["اهرم", "توان", "موج", "نارنج اهرم", "شتاب", "جهش", "بیدار"]
-        df = await fetch_data(leveraged_funds)
+        df = fetch_data(leveraged_funds)
     else:
         gold_funds = ["طلا", "آلتون", "تابش", "جواهر", "زر", "زرفام", "عیار", "کهربا", "گنج", "گوهر", "مثقال", "ناب", "نفیس", "نفیس"]
-        df = await fetch_data(gold_funds)
+        df = fetch_data(gold_funds)
 
     return df
-
-# تابع برای اجرای توابع هم‌زمان و نمایش داده‌ها در Streamlit
-def run_async_func(async_func, *args):
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    return loop.run_until_complete(async_func(*args))
 
 # تابع برای نمایش Streamlit
 def streamlit_main():
@@ -58,9 +57,9 @@ def streamlit_main():
     # انتخاب نوع صندوق توسط کاربر
     option = st.selectbox("انتخاب نوع صندوق", ["ETF", "اهرم", "طلا"])
 
-    # اجرای تابع هم‌روند و نمایش داده‌ها
+    # اجرای تابع و نمایش داده‌ها
     try:
-        df = run_async_func(main, option)
+        df = main(option)
         st.write(df)
     except Exception as e:
         st.error(f"An error occurred: {e}")
