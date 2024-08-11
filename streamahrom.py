@@ -4,7 +4,7 @@ import streamlit as st
 import asyncio
 from tsetmc.instruments import Instrument
 
-# توابع هم‌روند برای دریافت داده‌ها
+# تابع هم‌روند برای دریافت داده‌ها
 async def fetch_data(fund_list):
     dictdf = {}
     for fund in fund_list:
@@ -42,10 +42,11 @@ async def main(option):
     return df
 
 # تابع برای اجرای توابع هم‌روند و نمایش داده‌ها در Streamlit
-def run_async(func, *args):
+def get_data(option):
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
-    return loop.run_until_complete(func(*args))
+    df = loop.run_until_complete(main(option))
+    return df
 
 # تابع برای نمایش Streamlit
 def streamlit_main():
@@ -55,7 +56,7 @@ def streamlit_main():
     option = st.selectbox("انتخاب نوع صندوق", ["ETF", "اهرم", "طلا"])
 
     # اجرای تابع هم‌روند و نمایش داده‌ها
-    df = run_async(main, option)
+    df = get_data(option)
 
     if df is not None:
         # نمایش داده‌ها
