@@ -10,15 +10,21 @@ nest_asyncio.apply()
 async def fetch_data(fund_list):
     dictdf = {}
     for fund in fund_list:
-        inst = await Instrument.from_search(fund)
-        live = await inst.live_data()
-        price = live['pl']
-        nav = live['nav']
-        time = live['nav_datetime']
-        dictdf[fund] = [fund, price, nav, time] 
+        try:
+            inst = await Instrument.from_search(fund)
+            live = await inst.live_data()
+            price = live['pl']
+            nav = live['nav']
+            time = live['nav_datetime']
+            dictdf[fund] = [fund, price, nav, time]
+        except Exception as e:
+            st.error(f"Error fetching data for {fund}: {e}")
 
-    df = pd.DataFrame(dictdf, index=["nemad", 'Price', 'NAV', "Time"])
-    df = df.T.assign(hobab=(df.T["Price"] - df.T["NAV"]) / df.T["NAV"])
+    if not dictdf:
+        return pd.DataFrame()  # اگر داده‌ای وجود نداشت، DataFrame خالی برگردانید
+
+    df = pd.DataFrame.from_dict(dictdf, orient='index', columns=["nemad", "Price", "NAV", "Time"])
+    df['hobab'] = (df["Price"] - df["NAV"]) / df["NAV"]
     return df
 
 async def main(option):
@@ -43,18 +49,20 @@ async def main(option):
     return df
 
 def get_data(option):
-    return asyncio.run(main(option))
+    return asyncio.create_task(main(option))
 
 def streamlit_main():
     st.title('بررسی حباب صندوق‌ها')
 
     option = st.selectbox("انتخاب نوع صندوق", ["ETF", "اهرم", "طلا"])
 
-    # اجرای تابع async با استفاده از asyncio.run
-    df = get_data(option)
+    # اجرای تابع async با استفاده از asyncio.create_task
+    df = asyncio.run(get_data(option))
     
-    if df is not None:
+    if df is not None and not df.empty:
         st.write(df)
+    else:
+        st.warning("No data available or an error occurred.")
 
 if __name__ == '__main__':
     streamlit_main()
