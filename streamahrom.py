@@ -1,17 +1,9 @@
 import pandas as pd
-import requests
-from io import BytesIO
 import plotly.graph_objs as go
 import streamlit as st
-from tsetmc.instruments import Instrument
-import asyncio
-import nest_asyncio
-
-import streamlit as st
 import asyncio
 import nest_asyncio
 from tsetmc.instruments import Instrument
-import pandas as pd
 
 # تنظیم nest_asyncio برای مدیریت حلقه‌های هم‌روند
 nest_asyncio.apply()
@@ -72,17 +64,18 @@ async def hobab_ETF():
     return df
 
 # تابع برای اجرای توابع هم‌روند به‌صورت هم‌زمان
-def run_async_task(task):
+def run_async_task(coroutine):
     loop = asyncio.get_event_loop()
     if loop.is_running():
-        return asyncio.ensure_future(task)
+        return asyncio.ensure_future(coroutine)
     else:
-        return loop.run_until_complete(task)
+        return loop.run_until_complete(coroutine)
 
 # انتخاب نوع صندوق توسط کاربر
 option = st.selectbox("انتخاب نوع صندوق", ["ETF", "اهرم", "طلا"])
 
 # اجرای تابع هم‌روند و نمایش داده‌ها
+df = None
 if option == "ETF":
     df = run_async_task(hobab_ETF())
 elif option == "اهرم":
@@ -90,53 +83,45 @@ elif option == "اهرم":
 else:
     df = run_async_task(hobab_tala())
 
-# نمایش داده‌ها در Streamlit
-st.write(df)
+if df is not None:
+    # نمایش داده‌ها
+    st.write(df)
+    
+    # ایجاد نمودار حباب
+    def create_hobab_plot(df):
+        trace = go.Bar(
+            x=df.index,
+            y=df['hobab'],
+            marker=dict(color='blue'),
+            name='حباب صندوق'
+        )
 
+        layout = go.Layout(
+            title='حباب صندوق',
+            xaxis=dict(title='نماد'),
+            yaxis=dict(title='حباب', tickformat='.2%')  # قالب‌بندی درصدی با دو رقم اعشار
+        )
+        fig = go.Figure(data=[trace], layout=layout)
+        return fig
 
-# ایجاد نمودار حباب
-def create_hobab_plot(df):
-    trace = go.Bar(
-        x=df['nemad'],
-        y=df['hobab'],
-        marker=dict(color='blue'),
-        name='حباب صندوق'
-    )
+    # ایجاد نمودار اهرم
+    def create_leverage_plot(df):
+        trace = go.Bar(
+            x=df.index,
+            y=df['Leverage'],  # اطمینان حاصل کنید که ستون 'Leverage' در df موجود است
+            marker=dict(color='green'),
+            name='اهرم صندوق'
+        )
 
-    layout = go.Layout(
-        title='حباب صندوق',
-        xaxis=dict(title='نماد'),
-        yaxis=dict(title='حباب', tickformat='.2%')  # قالب‌بندی درصدی با دو رقم اعشار
-    )
-    fig = go.Figure(data=[trace], layout=layout)
-    return fig
+        layout = go.Layout(
+            title='اهرم صندوق',
+            xaxis=dict(title='نماد'),
+            yaxis=dict(title='اهرم', tickformat='.2f')  # قالب‌بندی درصدی بدون اعشار
+        )
+        fig = go.Figure(data=[trace], layout=layout)
+        return fig
 
-# ایجاد نمودار اهرم
-def create_leverage_plot(df):
-    trace = go.Bar(
-        x=df['nemad'],
-        y=df['Leverage'],
-        marker=dict(color='green'),
-        name='اهرم صندوق'
-    )
-
-    layout = go.Layout(
-        title='اهرم صندوق',
-        xaxis=dict(title='نماد'),
-        yaxis=dict(title='اهرم', tickformat='.2f')  # قالب‌بندی درصدی بدون اعشار
-    )
-    fig = go.Figure(data=[trace], layout=layout)
-    return fig
-
-
-
-
-
-
-
-df2 = df.iloc[:,1:]
-if df2 is not None:
-    df2 = df2.round(3)
+    df2 = df.iloc[:, 1:].round(3)
     st.write(df2)
 
     # نمایش نمودار حباب
@@ -144,10 +129,8 @@ if df2 is not None:
     st.plotly_chart(hobab_plot)
 
     # نمایش نمودار اهرم و پراکندگی در صورت انتخاب گزینه 'اهرم'
-    if option == "اهرم":
+    if option == "اهرم" and 'Leverage' in df.columns:
         leverage_plot = create_leverage_plot(df)
         st.plotly_chart(leverage_plot)
-
-
 
 st.write("Produced By Taha Sadeghizadeh")
