@@ -47,10 +47,7 @@ async def main(option):
 
 # تابع برای اجرای توابع هم‌روند و نمایش داده‌ها در Streamlit
 def get_data(option):
-    loop = asyncio.get_event_loop()
-    task = loop.create_task(main(option))
-    df = loop.run_until_complete(task)
-    return df
+    return asyncio.run(main(option))
 
 # تابع برای نمایش Streamlit
 def streamlit_main():
