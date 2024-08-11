@@ -14,7 +14,8 @@ import nest_asyncio
 from tsetmc.instruments import Instrument
 import pandas as pd
 
-nest_asyncio.apply()  # این خط کد حلقه‌های هم‌روند را نست می‌کند
+# استفاده از nest_asyncio برای تنظیم حلقه‌های هم‌روند
+nest_asyncio.apply()
 
 async def hobab_tala():
     dictdf = {}
@@ -68,7 +69,14 @@ async def hobab_ETF():
     df = df.T.assign(hobab=(df.T["Price"] - df.T["NAV"]) / df.T["NAV"])
     return df
 
-
+# تابع برای اجرای توابع هم‌روند
+def run_async_task(task):
+    loop = asyncio.get_event_loop()
+    if loop.is_running():
+        # در حال حاضر، حلقه در حال اجراست، بنابراین از `loop.run_in_executor` استفاده می‌کنیم
+        return asyncio.ensure_future(task)
+    else:
+        return loop.run_until_complete(task)
 
 
 
@@ -108,16 +116,21 @@ def create_leverage_plot(df):
 
 
 
+
 # انتخاب نوع صندوق توسط کاربر
 option = st.selectbox("انتخاب نوع صندوق", ["ETF", "اهرم", "طلا"])
 
 # اجرای تابع هم‌روند بر اساس گزینه انتخابی و نمایش داده‌ها
 if option == "ETF":
-    df = asyncio.run(hobab_ETF())
+    df = run_async_task(hobab_ETF())
 elif option == "اهرم":
-    df = asyncio.run(hobab_ahrom())
+    df = run_async_task(hobab_ahrom())
 else:
-    df = asyncio.run(hobab_tala())
+    df = run_async_task(hobab_tala())
+
+# نمایش داده‌ها در Streamlit
+#st.write(df)
+
 
 
 
