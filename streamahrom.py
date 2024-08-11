@@ -3,31 +3,66 @@ import requests
 from io import BytesIO
 import streamlit as st
 import plotly.graph_objs as go
+import streamlit as st
+import asyncio
+from tsetmc.instruments import Instrument
+import pandas as pd
 
-# بارگذاری داده‌ها از URL
-def load_data(option):
-    if option == "طلا":
-        file_name = "tala.xlsx"
-    elif option == "اهرم":
-        file_name = "ahromi"
-    else:
-        file_name = "ETF.xlsx"
+async def hobab_tala():
+    dictdf = {}
+    gold_funds = ["طلا", "آلتون", "تابش", "جواهر", "زر", "زرفام", "عیار", "کهربا", "گنج", "گوهر", "مثقال", "ناب", "نفیس", "نفیس"]
+    for fund in gold_funds:
+        inst = await Instrument.from_search(fund)
+        live = await inst.live_data()
+        price = live['pl']
+        nav = live['nav']
+        time = live['nav_datetime']
+        dictdf[fund] = [fund, price, nav, time] 
+        
+    df = pd.DataFrame(dictdf, index=["nemad", 'Price', 'NAV', "Time"])
+    df = df.T.assign(hobab=(df.T["Price"] - df.T["NAV"]) / df.T["NAV"])
+    return df
 
-    url = f'https://raw.githubusercontent.com/taholly/hobab/main/{file_name}'
-    response = requests.get(url)
+async def hobab_ahrom():
+    dictdf = {}
+    leveraged_funds = ["اهرم", "توان", "موج", "نارنج اهرم", "شتاب", "جهش", "بیدار"]
+    for fund in leveraged_funds:
+        inst = await Instrument.from_search(fund)
+        live = await inst.live_data()
+        price = live['pl']
+        nav = live['nav']
+        time = live['nav_datetime']
+        dictdf[fund] = [fund, price, nav, time] 
+        
+    df = pd.DataFrame(dictdf, index=["nemad", 'Price', 'NAV', "Time"])
+    df = df.T.assign(hobab=(df.T["Price"] - df.T["NAV"]) / df.T["NAV"])
+    return df
 
-    if response.status_code == 200:
-        file = BytesIO(response.content)
-        try:
-            df = pd.read_excel(file, engine='openpyxl')
-            df = df.rename(columns={'Unnamed: 0': "nemad"})
-            return df
-        except Exception as e:
-            st.error(f"Error reading the Excel file: {e}")
-            return None
-    else:
-        st.error(f"Failed to retrieve file: {response.status_code}")
-        return None
+async def hobab_ETF():
+    dictdf = {}
+    etf_funds = ["آتیمس", "آساس", "تاراز", "آوا", "ارزش", "نارین", "افق ملت", "الماس", "پیروز", "انار", "اوج", 
+                 "بازبیمه", "بهین رو", "پتروآبان", "پتروداریوش", "پتروصبا", "پتروما", "سمان", "پتروآگاه", 
+                 "متال", "رویین", "تخت گاز", "استیل", "فلزفارابی", "آذرین", "بذر", "پادا", "پالایش", "پرتو", 
+                 "کاردان", "ترمه", "اطلس", "ثروتم", "ثمین", "داریوش", "ثهام", "هامون", "هیوا", "جاودان", 
+                 "برلیان", "دریا", "رماس", "زرین", "ثنا", "سرو", "سلام", "آبنوس", "ویستا", "اکسیژن", "بیدار", 
+                 "توان", "جهش", "شتاب", "اهرم", "موج", "نارنج اهرم", "سپینود", "تیام", "ثروت ساز", "کاریس", 
+                 "هوشیار", "فیروزه", "آرام", "وبازار", "صدف", "فراز", "فارما کیان", "درسا", "هم وزن", "خلیج", 
+                 "مدیر", "مروارید", "تکپاد", "عقیق", "آگاس", "دارا یکم"]
+    for fund in etf_funds:
+        inst = await Instrument.from_search(fund)
+        live = await inst.live_data()
+        price = live['pl']
+        nav = live['nav']
+        time = live['nav_datetime']
+        dictdf[fund] = [fund, price, nav, time] 
+        
+    df = pd.DataFrame(dictdf, index=["nemad", 'Price', 'NAV', "Time"])
+    df = df.T.assign(hobab=(df.T["Price"] - df.T["NAV"]) / df.T["NAV"])
+    return df
+
+def run_async_task(task):
+    return asyncio.run(task)
+
 
 
 # ایجاد نمودار حباب
@@ -66,11 +101,16 @@ def create_leverage_plot(df):
 
 
 
-# رابط کاربری Streamlit
-option = st.sidebar.radio("لطفاً یکی از گزینه‌های زیر را انتخاب کنید:", ("ETF", "طلا", "اهرم"))
-st.title(f"محاسبه ی حباب صندوق های {option}")
+# انتخاب نوع صندوق توسط کاربر
+option = st.selectbox("انتخاب نوع صندوق", ["ETF", "اهرم", "طلا"])
 
-df =load_data(option)
+# اجرای تابع بر اساس گزینه انتخابی و نمایش داده‌ها
+if option == "ETF":
+    df = run_async_task(hobab_ETF())
+elif option == "اهرم":
+    df = run_async_task(hobab_ahrom())
+else:
+    df = run_async_task(hobab_tala())
 
 #df2 = df.iloc[:,1:]
 if df is not None:
