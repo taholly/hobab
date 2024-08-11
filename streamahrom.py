@@ -4,7 +4,7 @@ import streamlit as st
 from tsetmc.instruments import Instrument
 import pandas as pd
 
-# اجرای nest_asyncio برای حل مشکلات مربوط به حلقه رویداد
+# اعمال nest_asyncio برای حل مشکلات مربوط به حلقه رویداد
 nest_asyncio.apply()
 
 async def fetch_data(fund_list):
