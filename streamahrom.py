@@ -29,9 +29,36 @@ def load_data(option):
         st.error(f"Failed to retrieve file: {response.status_code}")
         return None
 
-# ایجاد نمودار حباب
 def create_hobab_plot(df):
-	@@ -69,19 +101,20 @@ def create_leverage_plot(df):
+    trace = go.Bar(
+        x=df['nemad'],
+        y=df['hobab'],
+        marker=dict(color='blue'),
+        name='حباب صندوق'
+    )
+    layout = go.Layout(
+        title='حباب صندوق',
+        xaxis=dict(title='نماد'),
+        yaxis=dict(title='حباب', tickformat='.2%')  # قالب‌بندی درصدی با دو رقم اعشار
+    )
+    fig = go.Figure(data=[trace], layout=layout)
+    return fig
+# ایجاد نمودار اهرم
+def create_leverage_plot(df):
+    trace = go.Bar(
+        x=df['nemad'],
+        y=df['Leverage'],
+        marker=dict(color='green'),
+        name='اهرم صندوق'
+    )
+    layout = go.Layout(
+        title='اهرم صندوق',
+        xaxis=dict(title='نماد'),
+        yaxis=dict(title='اهرم', tickformat='.2f')  # قالب‌بندی درصدی بدون اعشار
+    )
+    fig = go.Figure(data=[trace], layout=layout)
+    return fig
+# رابط کاربری Streamlit
 option = st.sidebar.radio("لطفاً یکی از گزینه‌های زیر را انتخاب کنید:", ("ETF", "طلا", "اهرم"))
 st.title(f"محاسبه ی حباب صندوق های {option}")
 
