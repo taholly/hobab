@@ -42,21 +42,25 @@ async def main(option):
     return df
 
 # تابع برای اجرای توابع هم‌روند و نمایش داده‌ها در Streamlit
+def run_async(func, *args):
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    return loop.run_until_complete(func(*args))
+
+# تابع برای نمایش Streamlit
 def streamlit_main():
     st.title('بررسی حباب صندوق‌ها')
-    
+
     # انتخاب نوع صندوق توسط کاربر
     option = st.selectbox("انتخاب نوع صندوق", ["ETF", "اهرم", "طلا"])
 
     # اجرای تابع هم‌روند و نمایش داده‌ها
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    df = loop.run_until_complete(main(option))
+    df = run_async(main, option)
 
     if df is not None:
         # نمایش داده‌ها
         st.write(df)
-        
+
         # ایجاد نمودار حباب
         def create_hobab_plot(df):
             trace = go.Bar(
