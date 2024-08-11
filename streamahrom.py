@@ -1,7 +1,11 @@
 import asyncio
+import nest_asyncio
 import streamlit as st
 from tsetmc.instruments import Instrument
 import pandas as pd
+
+# اجرای nest_asyncio برای حل مشکلات مربوط به حلقه رویداد
+nest_asyncio.apply()
 
 async def fetch_data(fund_list):
     dictdf = {}
@@ -38,14 +42,16 @@ async def main(option):
 
     return df
 
+def get_data(option):
+    return asyncio.run(main(option))
+
 def streamlit_main():
     st.title('بررسی حباب صندوق‌ها')
 
     option = st.selectbox("انتخاب نوع صندوق", ["ETF", "اهرم", "طلا"])
 
-    # ایجاد حلقه رویداد و اجرای تابع async
-    loop = asyncio.get_event_loop()
-    df = loop.run_until_complete(main(option))
+    # اجرای تابع async با استفاده از asyncio.run
+    df = get_data(option)
     
     if df is not None:
         st.write(df)
