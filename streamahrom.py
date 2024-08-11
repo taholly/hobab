@@ -1,68 +1,79 @@
 import pandas as pd
+import requests
+from io import BytesIO
 import streamlit as st
-from tsetmc.instruments import Instrument
-import asyncio
-from concurrent.futures import ThreadPoolExecutor
+import plotly.graph_objs as go
 
-# تابع هم‌روند برای دریافت داده‌ها
-async def fetch_data_async(fund_list):
-    dictdf = {}
-    for fund in fund_list:
-        try:
-            inst = await Instrument.from_search(fund)
-            live = await inst.live_data()
-            price = live.get('pl', None)
-            nav = live.get('nav', None)
-            time = live.get('nav_datetime', None)
-            dictdf[fund] = [fund, price, nav, time]
-        except Exception as e:
-            print(f"Error fetching data for {fund}: {e}")
-            dictdf[fund] = [fund, None, None, None]
-        
-    df = pd.DataFrame.from_dict(dictdf, orient='index', columns=['nemad', 'Price', 'NAV', 'Time'])
-    df['hobab'] = (df['Price'] - df['NAV']) / df['NAV']
-    return df
-
-def fetch_data(fund_list):
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    return loop.run_until_complete(fetch_data_async(fund_list))
-
-# تابع اصلی برای مدیریت داده‌ها
-def main(option):
-    if option == "ETF":
-        etf_funds = ["آتیمس", "آساس", "تاراز", "آوا", "ارزش", "نارین", "افق ملت", "الماس", "پیروز", "انار", 
-                     "اوج", "بازبیمه", "بهین رو", "پتروآبان", "پتروداریوش", "پتروصبا", "پتروما", "سمان", 
-                     "پتروآگاه", "متال", "رویین", "تخت گاز", "استیل", "فلزفارابی", "آذرین", "بذر", 
-                     "پادا", "پالایش", "پرتو", "کاردان", "ترمه", "اطلس", "ثروتم", "ثمین", "داریوش", 
-                     "ثهام", "هامون", "هیوا", "جاودان", "برلیان", "دریا", "رماس", "زرین", "ثنا", 
-                     "سرو", "سلام", "آبنوس", "ویستا", "اکسیژن", "بیدار", "توان", "جهش", "شتاب", 
-                     "اهرم", "موج", "نارنج اهرم", "سپینود", "تیام", "ثروت ساز", "کاریس", "هوشیار", 
-                     "فیروزه", "آرام", "وبازار", "صدف", "فراز", "فارما کیان", "درسا", "هم وزن", "خلیج", 
-                     "مدیر", "مروارید", "تکپاد", "عقیق", "آگاس", "دارا یکم"]
-        df = fetch_data(etf_funds)
+# بارگذاری داده‌ها از URL
+def load_data(option):
+    if option == "طلا":
+        file_name = "tala.xlsx"
     elif option == "اهرم":
-        leveraged_funds = ["اهرم", "توان", "موج", "نارنج اهرم", "شتاب", "جهش", "بیدار"]
-        df = fetch_data(leveraged_funds)
+        file_name = "ahromi"
     else:
-        gold_funds = ["طلا", "آلتون", "تابش", "جواهر", "زر", "زرفام", "عیار", "کهربا", "گنج", "گوهر", "مثقال", "ناب", "نفیس", "نفیس"]
-        df = fetch_data(gold_funds)
+        file_name = "ETF.xlsx"
 
-    return df
+    url = f'https://raw.githubusercontent.com/taholly/hobab/main/{file_name}'
+    response = requests.get(url)
 
-# تابع برای نمایش Streamlit
-def streamlit_main():
-    st.title('بررسی حباب صندوق‌ها')
+    if response.status_code == 200:
+        file = BytesIO(response.content)
+        try:
+            df = pd.read_excel(file, engine='openpyxl')
+            df = df.rename(columns={'Unnamed: 0': "nemad"})
+            return df
+        except Exception as e:
+            st.error(f"Error reading the Excel file: {e}")
+            return None
+    else:
+        st.error(f"Failed to retrieve file: {response.status_code}")
+        return None
 
-    # انتخاب نوع صندوق توسط کاربر
-    option = st.selectbox("انتخاب نوع صندوق", ["ETF", "اهرم", "طلا"])
+def create_hobab_plot(df):
+    trace = go.Bar(
+        x=df['nemad'],
+        y=df['hobab'],
+        marker=dict(color='blue'),
+        name='حباب صندوق'
+    )
+    layout = go.Layout(
+        title='حباب صندوق',
+        xaxis=dict(title='نماد'),
+        yaxis=dict(title='حباب', tickformat='.2%')  # قالب‌بندی درصدی با دو رقم اعشار
+    )
+    fig = go.Figure(data=[trace], layout=layout)
+    return fig
+# ایجاد نمودار اهرم
+def create_leverage_plot(df):
+    trace = go.Bar(
+        x=df['nemad'],
+        y=df['Leverage'],
+        marker=dict(color='green'),
+        name='اهرم صندوق'
+    )
+    layout = go.Layout(
+        title='اهرم صندوق',
+        xaxis=dict(title='نماد'),
+        yaxis=dict(title='اهرم', tickformat='.2f')  # قالب‌بندی درصدی بدون اعشار
+    )
+    fig = go.Figure(data=[trace], layout=layout)
+    return fig
+# رابط کاربری Streamlit
+option = st.sidebar.radio("لطفاً یکی از گزینه‌های زیر را انتخاب کنید:", ("ETF", "طلا", "اهرم"))
+st.title(f"محاسبه ی حباب صندوق های {option}")
 
-    # اجرای تابع و نمایش داده‌ها
-    try:
-        df = main(option)
-        st.write(df)
-    except Exception as e:
-        st.error(f"An error occurred: {e}")
+df = load_data(option)
+if df is not None:
+    df = df.round(3)
+    st.write(df)
 
-if __name__ == "__main__":
-    streamlit_main()
+    # نمایش نمودار حباب
+    hobab_plot = create_hobab_plot(df)
+    st.plotly_chart(hobab_plot)
+
+    # نمایش نمودار اهرم و پراکندگی در صورت انتخاب گزینه 'اهرم'
+    if option == "اهرم":
+        leverage_plot = create_leverage_plot(df)
+        st.plotly_chart(leverage_plot)
+        
+st.write("Produced By Taha Sadeghizadeh")
