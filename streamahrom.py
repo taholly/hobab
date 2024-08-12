@@ -64,7 +64,7 @@ st.title(f"محاسبه ی حباب صندوق های {option}")
 
 df = load_data(option)
 if df is not None:
-    df = df.round(3)
+    #df = df.round(3)
     st.write(df)
 
     # نمایش نمودار حباب
