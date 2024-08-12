@@ -43,6 +43,7 @@ def create_hobab_plot(df):
     )
     fig = go.Figure(data=[trace], layout=layout)
     return fig
+
 # ایجاد نمودار اهرم
 def create_leverage_plot(df):
     trace = go.Bar(
@@ -58,14 +59,27 @@ def create_leverage_plot(df):
     )
     fig = go.Figure(data=[trace], layout=layout)
     return fig
+
 # رابط کاربری Streamlit
 option = st.sidebar.radio("لطفاً یکی از گزینه‌های زیر را انتخاب کنید:", ("ETF", "طلا", "اهرم"))
 st.title(f"محاسبه ی حباب صندوق های {option}")
 
 df = load_data(option)
 if df is not None:
-    #df = df.round(3)
-    st.write(df)
+    # نمایش ساختار داده‌ها و انواع داده‌ها برای بررسی
+    st.write("ساختار داده‌ها:")
+    st.write(df.head())
+    st.write("انواع داده‌های ستون‌ها:")
+    st.write(df.dtypes)
+
+    # جایگزینی مقادیر گمشده (در صورت وجود) با 0
+    df = df.fillna(0)
+
+    # نمایش DataFrame
+    try:
+        st.dataframe(df)  # نمایش جدول به صورت تعاملی
+    except Exception as e:
+        st.error(f"Error displaying DataFrame: {e}")
 
     # نمایش نمودار حباب
     hobab_plot = create_hobab_plot(df)
