@@ -20,7 +20,7 @@ def load_data(option):
         file = BytesIO(response.content)
         try:
             df = pd.read_excel(file, engine='openpyxl')
-            df = df.rename(columns={'Unnamed: 0': "nemad2"})
+            df = df.iloc[:,1:]
             return df
         except Exception as e:
             st.error(f"Error reading the Excel file: {e}")
