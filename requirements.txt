@@ -1,8 +1,4 @@
 setuptools
-matplotlib==3.7.1
-numpy==1.23.5
-pandas==1.5.3
 openpyxl
 plotly
-requests
-streamlit==1.20.0
+streamlit
