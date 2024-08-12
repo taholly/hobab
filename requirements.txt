@@ -3,9 +3,5 @@ numpy==1.23.5
 pandas==1.5.3
 streamlit==1.37.1
 openpyxl
-bokeh==2.4.3
 plotly
 requests
-tsetmc
-asyncio
-nest_asyncio
