@@ -20,6 +20,7 @@ def load_data(option):
         file = BytesIO(response.content)
         try:
             df = pd.read_excel(file, engine='openpyxl')
+            st.write(df)
             df = df.rename(columns={'Unnamed: 0': "nemad"})
             return df
         except Exception as e:
@@ -63,7 +64,6 @@ option = st.sidebar.radio("لطفاً یکی از گزینه‌های زیر ر�
 st.title(f"محاسبه ی حباب صندوق های {option}")
 
 df = load_data(option)
-st.write(df)
 if df is not None:
     #df = df.round(3)
     st.write(df)
