@@ -63,6 +63,7 @@ option = st.sidebar.radio("لطفاً یکی از گزینه‌های زیر ر�
 st.title(f"محاسبه ی حباب صندوق های {option}")
 
 df = load_data(option)
+st.write(df)
 if df is not None:
     #df = df.round(3)
     st.write(df)
