@@ -20,8 +20,8 @@ def load_data(option):
         file = BytesIO(response.content)
         try:
             df = pd.read_excel(file, engine='openpyxl')
-            df2 = df.iloc[:,1:]
-            return df2
+            
+            return df
         except Exception as e:
             st.error(f"Error reading the Excel file: {e}")
             return None
@@ -65,7 +65,8 @@ st.title(f"محاسبه ی حباب صندوق های {option}")
 df = load_data(option)
 if df is not None:
     #df = df.round(3)
-    st.write(df)
+    df2 = df.iloc[:,1:]
+    st.write(df2)
 
     # نمایش نمودار حباب
     hobab_plot = create_hobab_plot(df)
