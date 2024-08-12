@@ -20,8 +20,8 @@ def load_data(option):
         file = BytesIO(response.content)
         try:
             df = pd.read_excel(file, engine='openpyxl')
-            df = df.iloc[:,1:]
-            return df
+            df2 = df.iloc[:,1:]
+            return df2
         except Exception as e:
             st.error(f"Error reading the Excel file: {e}")
             return None
