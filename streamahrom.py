@@ -4,6 +4,7 @@ from io import BytesIO
 import streamlit as st
 import plotly.graph_objs as go
 
+print(1)
 # بارگذاری داده‌ها از URL
 def load_data(option):
     if option == "طلا":
