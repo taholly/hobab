@@ -20,7 +20,6 @@ def load_data(option):
         file = BytesIO(response.content)
         try:
             df = pd.read_excel(file, engine='openpyxl')
-            st.write(df)
             return df
         except Exception as e:
             st.error(f"Error reading the Excel file: {e}")
