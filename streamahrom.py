@@ -21,9 +21,11 @@ def load_data(option):
         try:
             df = pd.read_excel(file, engine='openpyxl')
             if option == "طلا":
-                df = df.rename(columns={"Unnamed: 0":"nemad"})  # Ensure correct column names
+                pass
+            else:
                 df.pop("nemad")
                 df = df.rename(columns={"Unnamed: 0":"nemad"})
+
             return df
         except Exception as e:
             st.error(f"Error reading the Excel file: {e}")
