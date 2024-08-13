@@ -41,7 +41,7 @@ def create_hobab_plot(df):
     layout = go.Layout(
         title='حباب صندوق',
         xaxis=dict(title='نماد'),
-        yaxis=dict(title='حباب', tickformat='.2%'),
+        yaxis=dict(title='حباب', tickformat='.2%'),  # قالب‌بندی درصدی با دو رقم اعشار
         plot_bgcolor='rgba(0,0,0,0)',
         paper_bgcolor='rgba(0,0,0,0)',
         font=dict(color='white')
@@ -62,7 +62,7 @@ def create_leverage_plot(df):
     layout = go.Layout(
         title='اهرم صندوق',
         xaxis=dict(title='نماد'),
-        yaxis=dict(title='اهرم', tickformat='.2f'),
+        yaxis=dict(title='اهرم', tickformat='.2f'),  # قالب‌بندی درصدی بدون اعشار
         plot_bgcolor='rgba(0,0,0,0)',
         paper_bgcolor='rgba(0,0,0,0)',
         font=dict(color='white')
@@ -72,29 +72,13 @@ def create_leverage_plot(df):
 
 # تابع برای بولد کردن ارقام
 def bold_numbers(val):
-    return 'font-weight: bold'
+    return f'font-weight: bold'
 
 # رابط کاربری Streamlit
-st.markdown(
-    """
-    <style>
-    .sidebar .sidebar-content {
-        background: #2C3E50;
-        color: white;
-    }
-    .css-18e3th9 {
-        background-color: #2C3E50;
-        color: white;
-    }
-    .css-1d391kg {
-        background-color: #34495E;
-        color: white;
-    }
-    </style>
-    """,
+st.sidebar.markdown(
+    "<style>.sidebar .sidebar-content { background: #2C3E50; color: white; }</style>",
     unsafe_allow_html=True
 )
-
 option = st.sidebar.radio("لطفاً یکی از گزینه‌های زیر را انتخاب کنید:", ("ETF", "طلا", "اهرم"))
 st.title(f"محاسبه ی حباب صندوق های {option}")
 
