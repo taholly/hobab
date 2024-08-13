@@ -20,8 +20,10 @@ def load_data(option):
         file = BytesIO(response.content)
         try:
             df = pd.read_excel(file, engine='openpyxl')
-            df.pop("nemad")
-            df = df.rename(columns={"Unnamed: 0":"nemad"})
+            if option == "طلا":
+                df = df.rename(columns={"Unnamed: 0":"nemad"})  # Ensure correct column names
+                df.pop("nemad")
+                df = df.rename(columns={"Unnamed: 0":"nemad"})
             return df
         except Exception as e:
             st.error(f"Error reading the Excel file: {e}")
@@ -30,25 +32,46 @@ def load_data(option):
         st.error(f"Failed to retrieve file: {response.status_code}")
         return None
 
-# ایجاد نمودار حباب
-def create_hobab_plot(df):
-    trace = go.Bar(
+# ایجاد نمودار حباب با سه ستون
+def create_hobab_comparison_plot(df):
+    fig = go.Figure()
+
+    fig.add_trace(go.Bar(
+        x=df['nemad'],
+        y=df['real_hobab'],
+        marker=dict(color='blue'),
+        name='Real Hobab',
+        text=df['real_hobab'],
+        hoverinfo='x+y+text'
+    ))
+
+    fig.add_trace(go.Bar(
         x=df['nemad'],
         y=df['hobab'],
-        marker=dict(color='blue'),
-        name='حباب صندوق',
+        marker=dict(color='orange'),
+        name='Hobab',
         text=df['hobab'],
         hoverinfo='x+y+text'
-    )
-    layout = go.Layout(
-        title='حباب صندوق',
+    ))
+
+    fig.add_trace(go.Bar(
+        x=df['nemad'],
+        y=df['intrinsic_hobab'],
+        marker=dict(color='green'),
+        name='Intrinsic Hobab',
+        text=df['intrinsic_hobab'],
+        hoverinfo='x+y+text'
+    ))
+
+    fig.update_layout(
+        title='مقایسه حباب‌های واقعی، حباب و حباب ذاتی',
         xaxis=dict(title='نماد'),
-        yaxis=dict(title='حباب', tickformat='.2%'),  # قالب‌بندی درصدی با دو رقم اعشار
+        yaxis=dict(title='حباب', tickformat='.2%'),
+        barmode='group',
         plot_bgcolor='rgba(0,0,0,0)',
         paper_bgcolor='rgba(0,0,0,0)',
         font=dict(color='white')
     )
-    fig = go.Figure(data=[trace], layout=layout)
     return fig
 
 # ایجاد نمودار اهرم
@@ -64,7 +87,7 @@ def create_leverage_plot(df):
     layout = go.Layout(
         title='اهرم صندوق',
         xaxis=dict(title='نماد'),
-        yaxis=dict(title='اهرم', tickformat='.2f'),  # قالب‌بندی درصدی بدون اعشار
+        yaxis=dict(title='اهرم', tickformat='.2f'),
         plot_bgcolor='rgba(0,0,0,0)',
         paper_bgcolor='rgba(0,0,0,0)',
         font=dict(color='white')
@@ -94,13 +117,18 @@ if df is not None:
     # نمایش جدول به‌صورت تعاملی
     st.dataframe(df_styled)
 
-    # نمایش نمودار حباب
-    hobab_plot = create_hobab_plot(df)
-    st.plotly_chart(hobab_plot)
+    if option == "طلا":
+        # نمایش نمودار مقایسه حباب‌ها
+        hobab_comparison_plot = create_hobab_comparison_plot(df)
+        st.plotly_chart(hobab_comparison_plot)
+    else:
+        # نمایش نمودار حباب
+        hobab_plot = create_hobab_plot(df)
+        st.plotly_chart(hobab_plot)
 
-    # نمایش نمودار اهرم و پراکندگی در صورت انتخاب گزینه 'اهرم'
-    if option == "اهرم":
-        leverage_plot = create_leverage_plot(df)
-        st.plotly_chart(leverage_plot)
+        # نمایش نمودار اهرم و پراکندگی در صورت انتخاب گزینه 'اهرم'
+        if option == "اهرم":
+            leverage_plot = create_leverage_plot(df)
+            st.plotly_chart(leverage_plot)
 
 st.write("Produced By Taha Sadeghizadeh")
