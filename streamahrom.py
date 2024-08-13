@@ -50,7 +50,10 @@ def create_hobab_plot(df):
         yaxis=dict(title='حباب', tickformat='.2%'),  # قالب‌بندی درصدی با دو رقم اعشار
         plot_bgcolor='rgba(0,0,0,0)',
         paper_bgcolor='rgba(0,0,0,0)',
-        font=dict(color='white')
+        font=dict(color='white'),
+        width=1000,  # Width of the figure
+        height=600   # Height of the figure
+
     )
     fig = go.Figure(data=[trace], layout=layout)
     return fig
@@ -94,7 +97,9 @@ def create_hobab_comparison_plot(df):
         barmode='group',
         plot_bgcolor='rgba(0,0,0,0)',
         paper_bgcolor='rgba(0,0,0,0)',
-        font=dict(color='white')
+        font=dict(color='white'),
+        width=1000,  # Width of the figure
+        height=600
     )
     return fig
 
@@ -114,7 +119,9 @@ def create_leverage_plot(df):
         yaxis=dict(title='اهرم', tickformat='.2f'),
         plot_bgcolor='rgba(0,0,0,0)',
         paper_bgcolor='rgba(0,0,0,0)',
-        font=dict(color='white')
+        font=dict(color='white'),
+        width=1000,  # Width of the figure
+        height=600
     )
     fig = go.Figure(data=[trace], layout=layout)
     return fig
