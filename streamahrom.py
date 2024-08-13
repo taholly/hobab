@@ -51,8 +51,8 @@ def create_hobab_plot(df):
         plot_bgcolor='rgba(0,0,0,0)',
         paper_bgcolor='rgba(0,0,0,0)',
         font=dict(color='white'),
-        width=1500,  # Width of the figure
-        height=2000  # Height of the figure
+        width=3000,  # Width of the figure
+        height=1000 # Height of the figure
 
     )
     fig = go.Figure(data=[trace], layout=layout)
@@ -98,8 +98,8 @@ def create_hobab_comparison_plot(df):
         plot_bgcolor='rgba(0,0,0,0)',
         paper_bgcolor='rgba(0,0,0,0)',
         font=dict(color='white'),
-        width=1500,  # Width of the figure
-        height=2000
+        width=3000,  # Width of the figure
+        height=1000
     )
     return fig
 
@@ -120,8 +120,8 @@ def create_leverage_plot(df):
         plot_bgcolor='rgba(0,0,0,0)',
         paper_bgcolor='rgba(0,0,0,0)',
         font=dict(color='white'),
-        width=1500,  # Width of the figure
-        height=2000
+        width=3000,  # Width of the figure
+        height=1000
     )
     fig = go.Figure(data=[trace], layout=layout)
     return fig
