@@ -21,9 +21,7 @@ def load_data(option):
         try:
             df = pd.read_excel(file, engine='openpyxl')
             df.pop("nemad")
-            df = df.rename(columns={"Unnamed: 0":"nemad"})
-            df = df.set_index(df["nemad"])
-            df.pop("nemad")
+            df = df.rename(columns={"Unnamed: 0":"nemad"}))
             return df
         except Exception as e:
             st.error(f"Error reading the Excel file: {e}")
