@@ -4,7 +4,6 @@ from io import BytesIO
 import streamlit as st
 import plotly.graph_objs as go
 
-
 # بارگذاری داده‌ها از URL
 def load_data(option):
     if option == "طلا":
@@ -29,44 +28,60 @@ def load_data(option):
         st.error(f"Failed to retrieve file: {response.status_code}")
         return None
 
+# ایجاد نمودار حباب
 def create_hobab_plot(df):
     trace = go.Bar(
         x=df['nemad'],
         y=df['hobab'],
         marker=dict(color='blue'),
-        name='حباب صندوق'
+        name='حباب صندوق',
+        text=df['hobab'],
+        hoverinfo='x+y+text'
     )
     layout = go.Layout(
         title='حباب صندوق',
         xaxis=dict(title='نماد'),
-        yaxis=dict(title='حباب', tickformat='.2%')  # قالب‌بندی درصدی با دو رقم اعشار
+        yaxis=dict(title='حباب', tickformat='.2%'),  # قالب‌بندی درصدی با دو رقم اعشار
+        plot_bgcolor='rgba(0,0,0,0)',
+        paper_bgcolor='rgba(0,0,0,0)',
+        font=dict(color='white')
     )
     fig = go.Figure(data=[trace], layout=layout)
     return fig
+
 # ایجاد نمودار اهرم
 def create_leverage_plot(df):
     trace = go.Bar(
         x=df['nemad'],
         y=df['Leverage'],
         marker=dict(color='green'),
-        name='اهرم صندوق'
+        name='اهرم صندوق',
+        text=df['Leverage'],
+        hoverinfo='x+y+text'
     )
     layout = go.Layout(
         title='اهرم صندوق',
         xaxis=dict(title='نماد'),
-        yaxis=dict(title='اهرم', tickformat='.2f')  # قالب‌بندی درصدی بدون اعشار
+        yaxis=dict(title='اهرم', tickformat='.2f'),  # قالب‌بندی درصدی بدون اعشار
+        plot_bgcolor='rgba(0,0,0,0)',
+        paper_bgcolor='rgba(0,0,0,0)',
+        font=dict(color='white')
     )
     fig = go.Figure(data=[trace], layout=layout)
     return fig
+
 # رابط کاربری Streamlit
+st.sidebar.markdown(
+    "<style>.sidebar .sidebar-content { background: #2C3E50; color: white; }</style>",
+    unsafe_allow_html=True
+)
 option = st.sidebar.radio("لطفاً یکی از گزینه‌های زیر را انتخاب کنید:", ("ETF", "طلا", "اهرم"))
 st.title(f"محاسبه ی حباب صندوق های {option}")
 
 df = load_data(option)
 if df is not None:
-    #df = df.round(3)
-    df2 = df.iloc[:,1:]
-    st.write(df2)
+    df = df.round(3)
+    st.write(df.style.background_gradient(cmap='Blues'))
 
     # نمایش نمودار حباب
     hobab_plot = create_hobab_plot(df)
@@ -76,5 +91,5 @@ if df is not None:
     if option == "اهرم":
         leverage_plot = create_leverage_plot(df)
         st.plotly_chart(leverage_plot)
-        
+
 st.write("Produced By Taha Sadeghizadeh")
