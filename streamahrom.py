@@ -81,7 +81,9 @@ st.title(f"محاسبه ی حباب صندوق های {option}")
 df = load_data(option)
 if df is not None:
     df = df.round(3)
-    st.write(df.style.background_gradient(cmap='Blues'))
+
+    # نمایش جدول به‌صورت تعاملی
+    st.dataframe(df)
 
     # نمایش نمودار حباب
     hobab_plot = create_hobab_plot(df)
