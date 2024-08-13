@@ -32,6 +32,27 @@ def load_data(option):
         st.error(f"Failed to retrieve file: {response.status_code}")
         return None
 
+def create_hobab_plot(df):
+    trace = go.Bar(
+        x=df['nemad'],
+        y=df['hobab'],
+        marker=dict(color='blue'),
+        name='حباب صندوق',
+        text=df['hobab'],
+        hoverinfo='x+y+text'
+    )
+    layout = go.Layout(
+        title='حباب صندوق',
+        xaxis=dict(title='نماد'),
+        yaxis=dict(title='حباب', tickformat='.2%'),  # قالب‌بندی درصدی با دو رقم اعشار
+        plot_bgcolor='rgba(0,0,0,0)',
+        paper_bgcolor='rgba(0,0,0,0)',
+        font=dict(color='white')
+    )
+    fig = go.Figure(data=[trace], layout=layout)
+    return fig
+
+
 # ایجاد نمودار حباب با سه ستون
 def create_hobab_comparison_plot(df):
     fig = go.Figure()
