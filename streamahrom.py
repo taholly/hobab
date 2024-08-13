@@ -21,7 +21,8 @@ def load_data(option):
         try:
             df = pd.read_excel(file, engine='openpyxl')
             if option == "طلا":
-                pass
+                df.pop("Unnamed: 0")
+                df = df.sort_values(by="real_hobab")
             else:
                 df.pop("nemad")
                 df = df.rename(columns={"Unnamed: 0":"nemad"})
