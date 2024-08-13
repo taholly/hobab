@@ -78,7 +78,7 @@ def bold_numbers(val):
 
 # رابط کاربری Streamlit
 st.sidebar.markdown(
-    "<style>.sidebar .sidebar-content { background: #2C3E50; color: white; }</style>",
+    "<style>.sidebar .sidebar-content { background: #2C3E50; color: blue; }</style>",
     unsafe_allow_html=True
 )
 option = st.sidebar.radio("لطفاً یکی از گزینه‌های زیر را انتخاب کنید:", ("ETF", "طلا", "اهرم"))
