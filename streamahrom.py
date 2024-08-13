@@ -20,8 +20,6 @@ def load_data(option):
         file = BytesIO(response.content)
         try:
             df = pd.read_excel(file, engine='openpyxl')
-            df.pop("nemad")
-            df = df.rename(columns={"Unnamed: 0":"nemad"})
             return df
         except Exception as e:
             st.error(f"Error reading the Excel file: {e}")
@@ -43,7 +41,7 @@ def create_hobab_plot(df):
     layout = go.Layout(
         title='حباب صندوق',
         xaxis=dict(title='نماد'),
-        yaxis=dict(title='حباب', tickformat='.2%'),  # قالب‌بندی درصدی با دو رقم اعشار
+        yaxis=dict(title='حباب', tickformat='.2%'),
         plot_bgcolor='rgba(0,0,0,0)',
         paper_bgcolor='rgba(0,0,0,0)',
         font=dict(color='white')
@@ -64,7 +62,7 @@ def create_leverage_plot(df):
     layout = go.Layout(
         title='اهرم صندوق',
         xaxis=dict(title='نماد'),
-        yaxis=dict(title='اهرم', tickformat='.2f'),  # قالب‌بندی درصدی بدون اعشار
+        yaxis=dict(title='اهرم', tickformat='.2f'),
         plot_bgcolor='rgba(0,0,0,0)',
         paper_bgcolor='rgba(0,0,0,0)',
         font=dict(color='white')
@@ -72,11 +70,31 @@ def create_leverage_plot(df):
     fig = go.Figure(data=[trace], layout=layout)
     return fig
 
+# تابع برای بولد کردن ارقام
+def bold_numbers(val):
+    return 'font-weight: bold'
+
 # رابط کاربری Streamlit
-st.sidebar.markdown(
-    "<style>.sidebar .sidebar-content { background: #2C3E50; color: white; }</style>",
+st.markdown(
+    """
+    <style>
+    .sidebar .sidebar-content {
+        background: #2C3E50;
+        color: white;
+    }
+    .css-18e3th9 {
+        background-color: #2C3E50;
+        color: white;
+    }
+    .css-1d391kg {
+        background-color: #34495E;
+        color: white;
+    }
+    </style>
+    """,
     unsafe_allow_html=True
 )
+
 option = st.sidebar.radio("لطفاً یکی از گزینه‌های زیر را انتخاب کنید:", ("ETF", "طلا", "اهرم"))
 st.title(f"محاسبه ی حباب صندوق های {option}")
 
@@ -84,8 +102,11 @@ df = load_data(option)
 if df is not None:
     df = df.round(3)
 
+    # بولد کردن ارقام در دیتا فریم
+    df_styled = df.style.applymap(bold_numbers)
+
     # نمایش جدول به‌صورت تعاملی
-    st.dataframe(df)
+    st.dataframe(df_styled)
 
     # نمایش نمودار حباب
     hobab_plot = create_hobab_plot(df)
