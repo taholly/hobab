@@ -23,6 +23,7 @@ def load_data(option):
             if option == "طلا":
                 df.pop("Unnamed: 0")
                 df = df.sort_values(by="real_hobab")
+                df.drop(columns=['نماد' ,"hobab_gold","hobab_coin" , "p_of_others","p_of_coin" , "p_of_gold"])
             else:
                 df.pop("nemad")
                 df = df.rename(columns={"Unnamed: 0":"nemad"})
