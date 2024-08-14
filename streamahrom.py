@@ -77,7 +77,7 @@ def create_hobab_comparison_plot(df):
         y=df['hobab'],
         marker=dict(color='green'),
         name='Nominal Hobab',
-        text=df['intrinsic_hobab'],
+        text=df['hobab'],
         hoverinfo='x+y+text'
     ))
 
