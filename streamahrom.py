@@ -82,7 +82,7 @@ def create_hobab_comparison_plot(df):
     ))
 
     fig.update_layout(
-        title='مقایسه حباب‌های واقعی، حباب و حباب ذاتی',
+        title=' مقایسه حباب‌های واقعی، حبابی اسمی',
         xaxis=dict(title='نماد'),
         yaxis=dict(title='حباب', tickformat='.2%'),
         barmode='group',
