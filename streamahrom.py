@@ -74,15 +74,6 @@ def create_hobab_comparison_plot(df):
 
     fig.add_trace(go.Bar(
         x=df['nemad'],
-        y=df['hobab'],
-        marker=dict(color='orange'),
-        name='Hobab',
-        text=df['hobab'],
-        hoverinfo='x+y+text'
-    ))
-
-    fig.add_trace(go.Bar(
-        x=df['nemad'],
         y=df['intrinsic_hobab'],
         marker=dict(color='green'),
         name='Intrinsic Hobab',
