@@ -53,6 +53,10 @@ def load_data(option):
         st.error(f"دریافت فایل شکست خورد: {response.status_code}")
         return None
 
+def create_pie_chart(row, labels):
+    values = row.values
+    fig = px.pie(values=values, names=labels, title='نمودار پای‌چارت برای سطر انتخابی')
+    return fig
 # ایجاد نمودار حباب
 def create_hobab_plot(df):
     trace = go.Bar(
