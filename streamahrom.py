@@ -10,7 +10,7 @@ def load_data(option):
         file_name = "tala.xlsx"
     elif option == "اهرم":
         file_name = "ahromi.xlsx"
-        file_name2 = "AHROMCOMB.xlsx"
+        file_name2 = "ahromcomb.xlsx"
     else:
         file_name = "ETF.xlsx"
 
