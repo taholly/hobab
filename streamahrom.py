@@ -123,8 +123,7 @@ def create_leverage_plot(df):
         marker=dict(color='green'),
         name='اهرم صندوق',
         text=df['Leverage'],
-        hoverinfo='x+y+text',
-        tickformat='.2f'
+        hoverinfo='x+y+text'
     )
     layout = go.Layout(
         title='اهرم صندوق',
@@ -166,6 +165,7 @@ if df is not None:
         hobab_plot = create_hobab_plot(df)
         st.plotly_chart(hobab_plot)
         df['Leverage'] = df['Leverage'] * (df1['سهام'] / df1['NAV'])
+        df['Leverage'] = df['Leverage'].map('{:,.2f}'.format)
         leverage_plot = create_leverage_plot(df)
         st.plotly_chart(leverage_plot)
         # لیست صندوق‌ها برای انتخاب
