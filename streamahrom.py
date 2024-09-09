@@ -176,7 +176,8 @@ if df is not None:
         
         # فیلتر سطر مربوطه از df1
         selected_row = df1[df1['صندوق'] == selected_fund]
-        
+        st.datafram(df1)
+        df1.pop("NAV")
         if not selected_row.empty:
             selected_row = selected_row.iloc[0]
             labels = df1.columns.drop('صندوق')  # فرض می‌کنیم ستون اول نام صندوق است و بقیه ستون‌ها درصد هستند
