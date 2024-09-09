@@ -36,6 +36,7 @@ def load_data(option):
                     file = BytesIO(response.content)
                     try:
                         df1 = pd.read_excel(file, engine='openpyxl')
+                        df1.pop("Unnamed: 0")
                         return df , df1
                     except Exception as e:
                         st.error(f"خطا در خواندن فایل Excel: {e}")
