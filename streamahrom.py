@@ -161,9 +161,22 @@ if df is not None:
         hobab_plot = create_hobab_plot(df)
         st.plotly_chart(hobab_plot)
 
-        if option == "اهرم":
-            # نمایش نمودار اهرم
-            leverage_plot = create_leverage_plot(df)
-            st.plotly_chart(leverage_plot)
-            st.dataframe(df1)
+        # لیست صندوق‌ها برای انتخاب
+        funds = ["اهرم", "توان", "موج", "نارنج اهرم", "شتاب", "جهش", "بیدار"]
+        
+        # انتخاب صندوق توسط کاربر
+        selected_fund = st.selectbox("یکی از صندوق‌ها را انتخاب کنید:", funds)
+        
+        # فیلتر سطر مربوطه از df1
+        selected_row = df1[df1['صندوق'] == selected_fund]
+        
+        if not selected_row.empty:
+            selected_row = selected_row.iloc[0]
+            labels = df1.columns.drop('صندوق')  # فرض می‌کنیم ستون اول نام صندوق است و بقیه ستون‌ها درصد هستند
+
+            # رسم نمودار پای چارت
+            pie_chart = create_pie_chart(selected_row[labels], labels)
+            st.plotly_chart(pie_chart)
+        else:
+            st.warning(f"صندوق {selected_fund} یافت نشد.")
 st.write("Produced By Taha Sadeghizadeh")
