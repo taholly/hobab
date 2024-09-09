@@ -2,7 +2,7 @@ import pandas as pd
 import requests
 from io import BytesIO
 import streamlit as st
-import plotly.express as px
+import plotly.graph_objs as go
 
 # بارگذاری داده‌ها از URL
 def load_data(option):
@@ -50,10 +50,50 @@ def load_data(option):
         st.error(f"دریافت فایل شکست خورد: {response.status_code}")
         return None
 
-# ایجاد نمودار پای‌چارت برای یک سطر
-def create_pie_chart(row, labels):
-    values = row.values
-    fig = px.pie(values=values, names=labels, title='نمودار پای‌چارت برای سطر انتخابی')
+# ایجاد نمودار حباب
+def create_hobab_plot(df):
+    trace = go.Bar(
+        x=df['nemad'],
+        y=df['hobab'],
+        marker=dict(color='blue'),
+        name='حباب صندوق',
+        text=df['hobab'],
+        hoverinfo='x+y+text'
+    )
+    layout = go.Layout(
+        title='حباب صندوق',
+        xaxis=dict(title='نماد'),
+        yaxis=dict(title='حباب', tickformat='.2%'),
+        plot_bgcolor='rgba(0,0,0,0)',
+        paper_bgcolor='rgba(0,0,0,0)',
+        font=dict(color='white'),
+        width=800,
+        height=600
+    )
+    fig = go.Figure(data=[trace], layout=layout)
+    return fig
+
+# ایجاد نمودار اهرم
+def create_leverage_plot(df):
+    trace = go.Bar(
+        x=df['nemad'],
+        y=df['Leverage'],
+        marker=dict(color='green'),
+        name='اهرم صندوق',
+        text=df['Leverage'],
+        hoverinfo='x+y+text'
+    )
+    layout = go.Layout(
+        title='اهرم صندوق',
+        xaxis=dict(title='نماد'),
+        yaxis=dict(title='اهرم', tickformat='.2f'),
+        plot_bgcolor='rgba(0,0,0,0)',
+        paper_bgcolor='rgba(0,0,0,0)',
+        font=dict(color='white'),
+        width=800,
+        height=600
+    )
+    fig = go.Figure(data=[trace], layout=layout)
     return fig
 
 # رابط کاربری Streamlit
@@ -73,28 +113,26 @@ else:
 if df is not None:
     df = df.round(3)
     
-    # نمایش جدول اصلی
+    # نمایش جدول
     st.dataframe(df)
 
     # نمایش نمودار حباب یا نمودارهای اضافی در صورت انتخاب "اهرم"
-    if option == "اهرم" and df1 is not None:
-        # لیست صندوق‌ها برای انتخاب
-        funds = ["اهرم", "توان", "موج", "نارنج اهرم", "شتاب", "جهش", "بیدار"]
-        
-        # انتخاب صندوق توسط کاربر
-        selected_fund = st.selectbox("یکی از صندوق‌ها را انتخاب کنید:", funds)
-        
-        # فیلتر سطر مربوطه از df1
-        selected_row = df1[df1['صندوق'] == selected_fund]
-        
-        if not selected_row.empty:
-            selected_row = selected_row.iloc[0]
-            labels = df1.columns.drop('صندوق')  # فرض می‌کنیم ستون اول نام صندوق است و بقیه ستون‌ها درصد هستند
+    if option == "طلا":
+        # اینجا می‌توانید نمودار مرتبط با طلا را نمایش دهید
+        st.write("نمودار طلا را اینجا نمایش دهید")
+    else:
+        # نمایش نمودار حباب
+        hobab_plot = create_hobab_plot(df)
+        st.plotly_chart(hobab_plot)
 
-            # رسم نمودار پای چارت
-            pie_chart = create_pie_chart(selected_row[labels], labels)
-            st.plotly_chart(pie_chart)
-        else:
-            st.warning(f"صندوق {selected_fund} یافت نشد.")
+        if option == "اهرم":
+            # نمایش نمودار اهرم
+            leverage_plot = create_leverage_plot(df)
+            st.plotly_chart(leverage_plot)
+            
+            # بررسی و نمایش df1 (دیتافریم دوم)
+            if df1 is not None:
+                st.write("داده‌های اضافی از فایل AHROMCOMB.xlsx:")
+                st.dataframe(df1)
 
 st.write("Produced By Taha Sadeghizadeh")
