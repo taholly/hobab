@@ -123,7 +123,8 @@ def create_leverage_plot(df):
         marker=dict(color='green'),
         name='اهرم صندوق',
         text=df['Leverage'],
-        hoverinfo='x+y+text'
+        hoverinfo='x+y+text',
+        tickformat='.2f'
     )
     layout = go.Layout(
         title='اهرم صندوق',
