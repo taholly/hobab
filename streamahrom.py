@@ -168,8 +168,8 @@ if df is not None:
         df.set_index('nemad',inplace=True)
         df['Leverage'] = df['Leverage'] * (df1['سهام'] / df1['NAV'])
         df['Leverage'] = df['Leverage'].map('{:,.2f}'.format)
-        df1.reset_index()
-        df.reset_index()
+        df1 = df1.reset_index()
+        df = df.reset_index()
         leverage_plot = create_leverage_plot(df)
         st.plotly_chart(leverage_plot)
         # لیست صندوق‌ها برای انتخاب
