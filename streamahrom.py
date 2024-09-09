@@ -4,22 +4,16 @@ from io import BytesIO
 import streamlit as st
 import plotly.graph_objs as go
 
-import pandas as pd
-import requests
-from io import BytesIO
-import streamlit as st
-
 # بارگذاری داده‌ها از URL
 def load_data(option):
     if option == "طلا":
         file_name = "tala.xlsx"
     elif option == "اهرم":
-        file_name = "ahromi.xlsx"
-        file_name2 = "ahromcomb1.xlsx"
+        file_name = "ahromi"
+        file_name2 = "AHROMCOMB .xlsx"
     else:
         file_name = "ETF.xlsx"
 
-    # بارگذاری فایل اصلی
     url = f'https://raw.githubusercontent.com/taholly/hobab/main/{file_name}'
     response = requests.get(url)
     
@@ -27,7 +21,6 @@ def load_data(option):
         file = BytesIO(response.content)
         try:
             df = pd.read_excel(file, engine='openpyxl')
-            
             if option == "طلا":
                 df.pop("Unnamed: 0")
                 df = df.sort_values(by="real_hobab")
@@ -36,28 +29,71 @@ def load_data(option):
                 df.pop("nemad")
                 df = df.rename(columns={"Unnamed: 0": "nemad"})
 
-            # اگر اهرم انتخاب شود، فایل دوم را بارگذاری کنید
-            if option == "اهرم":
-                url2 = f'https://raw.githubusercontent.com/taholly/hobab/main/{file_name2}'
-                response2 = requests.get(url2)
-                
-                if response2.status_code == 200:
-                    file2 = BytesIO(response2.content)
-                    df1 = pd.read_excel(file2, engine='openpyxl')
-                    return df, df1  # بازگشت دو دیتا فریم برای اهرم
-                else:
-                    st.error(f"دریافت فایل دوم (ahromcomb1.xlsx) شکست خورد: {response2.status_code}")
-                    return df, None  # در صورت خطا، فقط df را بازگردانید
-            
-            return df, None  # در صورت عدم نیاز به فایل دوم، df و None را برگردانید
-
+            return df
         except Exception as e:
             st.error(f"خطا در خواندن فایل Excel: {e}")
-            return None, None
+            return None
     else:
-        st.error(f"دریافت فایل (فایل اول) شکست خورد: {response.status_code}")
-        return None, None
+        st.error(f"دریافت فایل شکست خورد: {response.status_code}")
+        return None
 
+# ایجاد نمودار حباب
+def create_hobab_plot(df):
+    trace = go.Bar(
+        x=df['nemad'],
+        y=df['hobab'],
+        marker=dict(color='blue'),
+        name='حباب صندوق',
+        text=df['hobab'],
+        hoverinfo='x+y+text'
+    )
+    layout = go.Layout(
+        title='حباب صندوق',
+        xaxis=dict(title='نماد'),
+        yaxis=dict(title='حباب', tickformat='.2%'),
+        plot_bgcolor='rgba(0,0,0,0)',
+        paper_bgcolor='rgba(0,0,0,0)',
+        font=dict(color='white'),
+        width=800,  # عرض مناسب‌تر
+        height=600
+    )
+    fig = go.Figure(data=[trace], layout=layout)
+    return fig
+
+# ایجاد نمودار مقایسه حباب‌ها
+def create_hobab_comparison_plot(df):
+    fig = go.Figure()
+
+    fig.add_trace(go.Bar(
+        x=df['nemad'],
+        y=df['real_hobab'],
+        marker=dict(color='blue'),
+        name='Real Hobab',
+        text=df['real_hobab'],
+        hoverinfo='x+y+text'
+    ))
+
+    fig.add_trace(go.Bar(
+        x=df['nemad'],
+        y=df['hobab'],
+        marker=dict(color='green'),
+        name='Nominal Hobab',
+        text=df['hobab'],
+        hoverinfo='x+y+text'
+    ))
+
+    fig.update_layout(
+        title='مقایسه حباب‌های واقعی و اسمی',
+        xaxis=dict(title='نماد'),
+        yaxis=dict(title='حباب', tickformat='.2%'),
+        barmode='group',
+        plot_bgcolor='rgba(0,0,0,0)',
+        paper_bgcolor='rgba(0,0,0,0)',
+        font=dict(color='white'),
+        width=800,  # عرض مناسب‌تر
+        height=600
+    )
+    return fig
 
 # ایجاد نمودار اهرم
 def create_leverage_plot(df):
