@@ -10,7 +10,7 @@ def load_data(option):
         file_name = "tala.xlsx"
     elif option == "اهرم":
         file_name = "ahromi"
-        file_name2 = "AHROMCOMB .xlsx"
+        file_name2 = "ahromcomb1.xlsx"
     else:
         file_name = "ETF.xlsx"
 
@@ -25,6 +25,21 @@ def load_data(option):
                 df.pop("Unnamed: 0")
                 df = df.sort_values(by="real_hobab")
                 df.drop(columns=['نماد', "hobab_gold", "hobab_coin", "p_of_others", "p_of_coin", "p_of_gold"], inplace=True)
+                return df
+            elif option == 'اهرم':
+                df.pop("nemad")
+                df = df.rename(columns={"Unnamed: 0": "nemad"})
+                
+                url = f'https://raw.githubusercontent.com/taholly/hobab/main/{file_name2}'
+                response = requests.get(url)
+                if response.status_code == 200:
+                    file = BytesIO(response.content)
+                    try:
+                        df1 = pd.read_excel(file, engine='openpyxl')
+                        return df , df1
+                    except Exception as e:
+                        st.error(f"خطا در خواندن فایل Excel: {e}")
+                        return None    
             else:
                 df.pop("nemad")
                 df = df.rename(columns={"Unnamed: 0": "nemad"})
@@ -126,7 +141,10 @@ st.sidebar.markdown(
 option = st.sidebar.radio("لطفاً یکی از گزینه‌های زیر را انتخاب کنید:", ("ETF", "طلا", "اهرم"))
 st.title(f"محاسبه ی حباب صندوق‌های {option}")
 
-df = load_data(option)
+if option == "اهرم":
+    df, df1 = load_data(option)
+else:
+    df = load_data(option)
 if df is not None:
     df = df.round(3)
 
@@ -146,5 +164,5 @@ if df is not None:
             # نمایش نمودار اهرم
             leverage_plot = create_leverage_plot(df)
             st.plotly_chart(leverage_plot)
-
+            st.dataframe(df1)
 st.write("Produced By Taha Sadeghizadeh")
