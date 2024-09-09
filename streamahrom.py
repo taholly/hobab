@@ -164,31 +164,32 @@ if df is not None:
         # نمایش نمودار حباب
         hobab_plot = create_hobab_plot(df)
         st.plotly_chart(hobab_plot)
-        df1.set_index('صندوق',inplace=True)
-        df.set_index('nemad',inplace=True)
-        df['Leverage'] = df['Leverage'] * (df1['سهام'] / df1['NAV'])
-        df['Leverage'] = df['Leverage'].map('{:,.2f}'.format)
-        df1 = df1.reset_index()
-        df = df.reset_index()
-        leverage_plot = create_leverage_plot(df)
-        st.plotly_chart(leverage_plot)
-        # لیست صندوق‌ها برای انتخاب
-        funds = ["اهرم", "توان", "موج", "نارنج اهرم", "شتاب", "جهش", "بیدار"]
+        if option == "اهرم":
+            df1.set_index('صندوق',inplace=True)
+            df.set_index('nemad',inplace=True)
+            df['Leverage'] = df['Leverage'] * (df1['سهام'] / df1['NAV'])
+            df['Leverage'] = df['Leverage'].map('{:,.2f}'.format)
+            df1 = df1.reset_index()
+            df = df.reset_index()
+            leverage_plot = create_leverage_plot(df)
+            st.plotly_chart(leverage_plot)
+            # لیست صندوق‌ها برای انتخاب
+            funds = ["اهرم", "توان", "موج", "نارنج اهرم", "شتاب", "جهش", "بیدار"]
         
         # انتخاب صندوق توسط کاربر
-        selected_fund = st.selectbox("یکی از صندوق‌ها را انتخاب کنید:", funds)
-        
-        # فیلتر سطر مربوطه از df1
-        selected_row = df1[df1['صندوق'] == selected_fund]
-        st.dataframe(df1)
-        df1.pop("NAV")
-        if not selected_row.empty:
-            selected_row = selected_row.iloc[0]
-            labels = df1.columns.drop('صندوق')  # فرض می‌کنیم ستون اول نام صندوق است و بقیه ستون‌ها درصد هستند
-
-            # رسم نمودار پای چارت
-            pie_chart = create_pie_chart(selected_row[labels], labels)
-            st.plotly_chart(pie_chart)
-        else:
-            st.warning(f"صندوق {selected_fund} یافت نشد.")
+            selected_fund = st.selectbox("یکی از صندوق‌ها را انتخاب کنید:", funds)
+            
+            # فیلتر سطر مربوطه از df1
+            selected_row = df1[df1['صندوق'] == selected_fund]
+            st.dataframe(df1)
+            df1.pop("NAV")
+            if not selected_row.empty:
+                selected_row = selected_row.iloc[0]
+                labels = df1.columns.drop('صندوق')  # فرض می‌کنیم ستون اول نام صندوق است و بقیه ستون‌ها درصد هستند
+    
+                # رسم نمودار پای چارت
+                pie_chart = create_pie_chart(selected_row[labels], labels)
+                st.plotly_chart(pie_chart)
+            else:
+                st.warning(f"صندوق {selected_fund} یافت نشد.")
 st.write("Produced By Taha Sadeghizadeh")
