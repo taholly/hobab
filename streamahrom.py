@@ -176,7 +176,7 @@ if df is not None:
         
         # فیلتر سطر مربوطه از df1
         selected_row = df1[df1['صندوق'] == selected_fund]
-        st.datafram(df1)
+        st.dataframe(df1)
         df1.pop("NAV")
         if not selected_row.empty:
             selected_row = selected_row.iloc[0]
