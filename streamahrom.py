@@ -164,7 +164,9 @@ if df is not None:
         # نمایش نمودار حباب
         hobab_plot = create_hobab_plot(df)
         st.plotly_chart(hobab_plot)
-        df['Leverage'] = df['Leverage'] * (df1['']
+        df['Leverage'] = float(df['Leverage'] * (df1['سهام'] / df1['NAV']))
+        leverage_plot = create_leverage_plot(df)
+        st.plotly_chart(leverage_plot)
         # لیست صندوق‌ها برای انتخاب
         funds = ["اهرم", "توان", "موج", "نارنج اهرم", "شتاب", "جهش", "بیدار"]
         
