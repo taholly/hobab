@@ -10,12 +10,13 @@ def load_data(option):
         file_name = "tala.xlsx"
     elif option == "اهرم":
         file_name = "ahromi"
+        file_name2 = "AHROMCOMB .xlsx"
     else:
         file_name = "ETF.xlsx"
 
     url = f'https://raw.githubusercontent.com/taholly/hobab/main/{file_name}'
     response = requests.get(url)
-
+    
     if response.status_code == 200:
         file = BytesIO(response.content)
         try:
@@ -23,19 +24,20 @@ def load_data(option):
             if option == "طلا":
                 df.pop("Unnamed: 0")
                 df = df.sort_values(by="real_hobab")
-                df.drop(columns=['نماد' ,"hobab_gold","hobab_coin" , "p_of_others","p_of_coin" , "p_of_gold"])
+                df.drop(columns=['نماد', "hobab_gold", "hobab_coin", "p_of_others", "p_of_coin", "p_of_gold"], inplace=True)
             else:
                 df.pop("nemad")
-                df = df.rename(columns={"Unnamed: 0":"nemad"})
+                df = df.rename(columns={"Unnamed: 0": "nemad"})
 
             return df
         except Exception as e:
-            st.error(f"Error reading the Excel file: {e}")
+            st.error(f"خطا در خواندن فایل Excel: {e}")
             return None
     else:
-        st.error(f"Failed to retrieve file: {response.status_code}")
+        st.error(f"دریافت فایل شکست خورد: {response.status_code}")
         return None
 
+# ایجاد نمودار حباب
 def create_hobab_plot(df):
     trace = go.Bar(
         x=df['nemad'],
@@ -48,19 +50,17 @@ def create_hobab_plot(df):
     layout = go.Layout(
         title='حباب صندوق',
         xaxis=dict(title='نماد'),
-        yaxis=dict(title='حباب', tickformat='.2%'),  # قالب‌بندی درصدی با دو رقم اعشار
+        yaxis=dict(title='حباب', tickformat='.2%'),
         plot_bgcolor='rgba(0,0,0,0)',
         paper_bgcolor='rgba(0,0,0,0)',
         font=dict(color='white'),
-        width=60000,  # Width of the figure
-        height=600 # Height of the figure
-
+        width=800,  # عرض مناسب‌تر
+        height=600
     )
     fig = go.Figure(data=[trace], layout=layout)
     return fig
 
-
-# ایجاد نمودار حباب با سه ستون
+# ایجاد نمودار مقایسه حباب‌ها
 def create_hobab_comparison_plot(df):
     fig = go.Figure()
 
@@ -83,14 +83,14 @@ def create_hobab_comparison_plot(df):
     ))
 
     fig.update_layout(
-        title=' مقایسه حباب‌های واقعی، حبابی اسمی',
+        title='مقایسه حباب‌های واقعی و اسمی',
         xaxis=dict(title='نماد'),
         yaxis=dict(title='حباب', tickformat='.2%'),
         barmode='group',
         plot_bgcolor='rgba(0,0,0,0)',
         paper_bgcolor='rgba(0,0,0,0)',
         font=dict(color='white'),
-        width=60000,  # Width of the figure
+        width=800,  # عرض مناسب‌تر
         height=600
     )
     return fig
@@ -112,15 +112,11 @@ def create_leverage_plot(df):
         plot_bgcolor='rgba(0,0,0,0)',
         paper_bgcolor='rgba(0,0,0,0)',
         font=dict(color='white'),
-        width=60000,  # Width of the figure
+        width=800,  # عرض مناسب‌تر
         height=600
     )
     fig = go.Figure(data=[trace], layout=layout)
     return fig
-
-# تابع برای بولد کردن ارقام
-def bold_numbers(val):
-    return f'font-weight: bold'
 
 # رابط کاربری Streamlit
 st.sidebar.markdown(
@@ -128,17 +124,14 @@ st.sidebar.markdown(
     unsafe_allow_html=True
 )
 option = st.sidebar.radio("لطفاً یکی از گزینه‌های زیر را انتخاب کنید:", ("ETF", "طلا", "اهرم"))
-st.title(f"محاسبه ی حباب صندوق های {option}")
+st.title(f"محاسبه ی حباب صندوق‌های {option}")
 
 df = load_data(option)
 if df is not None:
     df = df.round(3)
 
-    # بولد کردن ارقام در دیتا فریم
-    df_styled = df.style.applymap(bold_numbers)
-
-    # نمایش جدول به‌صورت تعاملی
-    st.dataframe(df_styled)
+    # نمایش جدول
+    st.dataframe(df)
 
     if option == "طلا":
         # نمایش نمودار مقایسه حباب‌ها
@@ -149,8 +142,8 @@ if df is not None:
         hobab_plot = create_hobab_plot(df)
         st.plotly_chart(hobab_plot)
 
-        # نمایش نمودار اهرم و پراکندگی در صورت انتخاب گزینه 'اهرم'
         if option == "اهرم":
+            # نمایش نمودار اهرم
             leverage_plot = create_leverage_plot(df)
             st.plotly_chart(leverage_plot)
 
