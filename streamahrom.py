@@ -164,7 +164,7 @@ if df is not None:
         # نمایش نمودار حباب
         hobab_plot = create_hobab_plot(df)
         st.plotly_chart(hobab_plot)
-
+        df['Leverage'] = df['Leverage'] * (df1['']
         # لیست صندوق‌ها برای انتخاب
         funds = ["اهرم", "توان", "موج", "نارنج اهرم", "شتاب", "جهش", "بیدار"]
         
