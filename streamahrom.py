@@ -55,7 +55,7 @@ def load_data(option):
 
 def create_pie_chart(row, labels):
     values = row.values
-    fig = px.pie(values=values, names=labels, title='نمودار پای‌چارت برای سطر انتخابی')
+    fig = px.pie(values=values, names=labels, title='ترکیب دارایی ها')
     return fig
 # ایجاد نمودار حباب
 def create_hobab_plot(df):
