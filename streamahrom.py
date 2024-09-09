@@ -160,7 +160,7 @@ if df is not None:
         # نمایش نمودار مقایسه حباب‌ها
         hobab_comparison_plot = create_hobab_comparison_plot(df)
         st.plotly_chart(hobab_comparison_plot)
-    elif option == "اهرم"::
+    elif option == "اهرم":
         
         
         df1.set_index('صندوق',inplace=True)
